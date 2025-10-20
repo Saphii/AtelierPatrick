@@ -19,6 +19,16 @@ const Nav = styled.nav`
   justify-content: space-between;
   align-items: center;
   height: 80px;
+  
+  @media (max-width: 768px) {
+    padding: 0 15px;
+    height: 70px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0 10px;
+    height: 60px;
+  }
 `;
 
 const Logo = styled.div`
@@ -34,9 +44,24 @@ const Logo = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
-    color: #8B4513;
-    font-weight: bold;
+    overflow: hidden;
+    flex-shrink: 0;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    
+    @media (max-width: 768px) {
+      width: 45px;
+      height: 45px;
+    }
+    
+    @media (max-width: 480px) {
+      width: 40px;
+      height: 40px;
+    }
   }
   
   .logo-text {
@@ -48,6 +73,22 @@ const Logo = styled.div`
       font-size: 14px;
       font-weight: 400;
       opacity: 0.9;
+      
+      @media (max-width: 768px) {
+        font-size: 12px;
+      }
+      
+      @media (max-width: 480px) {
+        display: none;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      font-size: 20px;
+    }
+    
+    @media (max-width: 480px) {
+      font-size: 18px;
     }
   }
 `;
@@ -60,6 +101,10 @@ const NavLinks = styled.ul`
   @media (max-width: 768px) {
     gap: 20px;
   }
+  
+  @media (max-width: 480px) {
+    gap: 15px;
+  }
 `;
 
 const NavLink = styled(Link)`
@@ -71,6 +116,7 @@ const NavLink = styled(Link)`
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 1rem;
   
   &:hover {
     background: rgba(255, 255, 255, 0.1);
@@ -79,6 +125,22 @@ const NavLink = styled(Link)`
   
   &.active {
     background: rgba(255, 255, 255, 0.2);
+  }
+  
+  @media (max-width: 768px) {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    gap: 6px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    gap: 4px;
+    
+    span {
+      display: none;
+    }
   }
 `;
 
@@ -104,6 +166,22 @@ const AdminButton = styled.button`
     background: rgba(76, 175, 80, 0.2);
     border-color: rgba(76, 175, 80, 0.5);
   }
+  
+  @media (max-width: 768px) {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    gap: 4px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 5px 8px;
+    font-size: 0.7rem;
+    gap: 3px;
+    
+    span {
+      display: none;
+    }
+  }
 `;
 
 const Header = ({ onAdminClick, isAuthenticated, onLogout }) => {
@@ -113,7 +191,9 @@ const Header = ({ onAdminClick, isAuthenticated, onLogout }) => {
     <HeaderContainer>
       <Nav>
         <Logo>
-          <div className="logo-icon">🏠</div>
+          <div className="logo-icon">
+            <img src="/images/logo_patrick.png" alt="Logo L'Atelier de Patrick" />
+          </div>
           <div className="logo-text">
             L'Atelier de Patrick
             <div className="subtitle">Créations Bois & 3D</div>
@@ -126,7 +206,7 @@ const Header = ({ onAdminClick, isAuthenticated, onLogout }) => {
               to="/" 
               className={location.pathname === '/' ? 'active' : ''}
             >
-              <FaHome /> Accueil
+              <FaHome /> <span>Accueil</span>
             </NavLink>
           </li>
           <li>
@@ -134,7 +214,7 @@ const Header = ({ onAdminClick, isAuthenticated, onLogout }) => {
               to="/galerie" 
               className={location.pathname === '/galerie' ? 'active' : ''}
             >
-              <FaImages /> Galerie
+              <FaImages /> <span>Galerie</span>
             </NavLink>
           </li>
           <li>
@@ -142,7 +222,7 @@ const Header = ({ onAdminClick, isAuthenticated, onLogout }) => {
               to="/contact" 
               className={location.pathname === '/contact' ? 'active' : ''}
             >
-              <FaEnvelope /> Contact
+              <FaEnvelope /> <span>Contact</span>
             </NavLink>
           </li>
           <li>
@@ -153,7 +233,7 @@ const Header = ({ onAdminClick, isAuthenticated, onLogout }) => {
               title={isAuthenticated ? 'Se déconnecter' : 'Administration'}
             >
               {isAuthenticated ? <FaSignOutAlt /> : <FaCog />}
-              {isAuthenticated ? 'Déconnexion' : 'Admin'}
+              <span>{isAuthenticated ? 'Déconnexion' : 'Admin'}</span>
             </AdminButton>
           </li>
         </NavLinks>

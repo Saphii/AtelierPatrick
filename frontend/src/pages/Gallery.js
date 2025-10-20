@@ -43,11 +43,28 @@ const FilterButton = styled.button`
   font-weight: 500;
   transition: all 0.3s ease;
   cursor: pointer;
+  position: relative;
   
   &:hover {
     background: #8B4513;
     color: white;
     transform: translateY(-2px);
+  }
+  
+  .count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #A0522D;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
   }
 `;
 
@@ -210,42 +227,33 @@ const Gallery = () => {
   const fetchCreations = async () => {
     try {
       const response = await axios.get('/api/creations/');
-      setCreations(response.data);
+      console.log('Données reçues:', response.data);
+      
+      // S'assurer que les données sont un tableau
+      if (Array.isArray(response.data)) {
+        setCreations(response.data);
+      } else if (response.data && Array.isArray(response.data.results)) {
+        // Si c'est une réponse paginée
+        setCreations(response.data.results);
+      } else {
+        console.error('Format de données inattendu:', response.data);
+        setCreations([]);
+      }
     } catch (error) {
       console.error('Erreur lors du chargement des créations:', error);
-      // Données de démonstration en cas d'erreur
-      setCreations([
-        {
-          id: 1,
-          title: "Table en chêne massif",
-          description: "Table à manger sur mesure en chêne massif, finition naturelle",
-          category: "bois",
-          image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
-          price: 450.00
-        },
-        {
-          id: 2,
-          title: "Figurine personnalisée",
-          description: "Impression 3D d'une figurine personnalisée selon vos spécifications",
-          category: "3d",
-          image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
-          price: 25.00
-        },
-        {
-          id: 3,
-          title: "Étagère mixte bois/3D",
-          description: "Étagère moderne combinant structure en bois et éléments imprimés en 3D",
-          category: "mixte",
-          image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
-          price: 120.00
-        }
-      ]);
+      setCreations([]);
     } finally {
       setLoading(false);
     }
   };
 
   const filterCreations = () => {
+    // S'assurer que creations est un tableau
+    if (!Array.isArray(creations)) {
+      setFilteredCreations([]);
+      return;
+    }
+
     let filtered = creations;
 
     // Filtre par catégorie
@@ -271,6 +279,11 @@ const Gallery = () => {
       'mixte': 'Mixte'
     };
     return labels[category] || category;
+  };
+
+  const getCategoryCount = (category) => {
+    if (!Array.isArray(creations)) return 0;
+    return creations.filter(creation => creation.category === category).length;
   };
 
   if (loading) {
@@ -299,24 +312,36 @@ const Gallery = () => {
           onClick={() => setActiveFilter('all')}
         >
           <FaFilter /> Toutes
+          {creations.length > 0 && (
+            <span className="count">{creations.length}</span>
+          )}
         </FilterButton>
         <FilterButton
           active={activeFilter === 'bois'}
           onClick={() => setActiveFilter('bois')}
         >
           Créations Bois
+          {getCategoryCount('bois') > 0 && (
+            <span className="count">{getCategoryCount('bois')}</span>
+          )}
         </FilterButton>
         <FilterButton
           active={activeFilter === '3d'}
           onClick={() => setActiveFilter('3d')}
         >
           Impressions 3D
+          {getCategoryCount('3d') > 0 && (
+            <span className="count">{getCategoryCount('3d')}</span>
+          )}
         </FilterButton>
         <FilterButton
           active={activeFilter === 'mixte'}
           onClick={() => setActiveFilter('mixte')}
         >
           Projets Mixtes
+          {getCategoryCount('mixte') > 0 && (
+            <span className="count">{getCategoryCount('mixte')}</span>
+          )}
         </FilterButton>
       </FiltersSection>
 

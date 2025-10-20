@@ -34,9 +34,13 @@ const Logo = styled.div`
     align-items: center;
     justify-content: center;
     margin: 0 auto 20px;
-    color: white;
-    font-size: 2rem;
-    font-weight: bold;
+    overflow: hidden;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
   }
   
   h1 {
@@ -180,7 +184,9 @@ const Login = ({ onLoginSuccess }) => {
     <LoginContainer>
       <LoginCard>
         <Logo>
-          <div className="logo-icon">🏠</div>
+          <div className="logo-icon">
+            <img src="/images/logo_patrick.png" alt="Logo L'Atelier de Patrick" />
+          </div>
           <h1>Administration</h1>
           <p>L'Atelier de Patrick</p>
         </Logo>

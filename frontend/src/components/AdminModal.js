@@ -413,9 +413,16 @@ const AdminModal = ({ onClose, onLoginSuccess, onLogout, isAuthenticated }) => {
     try {
       setLoading(true);
       const data = await creationService.getAllAdmin();
-      setCreations(data);
+      // S'assurer que data est un tableau
+      if (Array.isArray(data)) {
+        setCreations(data);
+      } else {
+        console.error('Les données ne sont pas un tableau:', data);
+        setCreations([]);
+      }
     } catch (error) {
       console.error('Erreur lors du chargement des créations:', error);
+      setCreations([]);
     } finally {
       setLoading(false);
     }
