@@ -187,15 +187,18 @@ const MapSection = styled.div`
     margin-bottom: 30px;
   }
   
-  .map-placeholder {
-    background: #ddd;
+  .map-container {
+    width: 100%;
     height: 300px;
     border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #666;
-    font-size: 1.1rem;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
   }
 `;
 
@@ -259,7 +262,7 @@ const Contact = () => {
             </div>
             <div className="content">
               <h3>Adresse</h3>
-              <p>123 Rue de l'Artisanat<br />75000 Paris, France</p>
+              <p>Balgau (Alsace)</p>
             </div>
           </InfoItem>
           
@@ -379,9 +382,18 @@ const Contact = () => {
 
       <MapSection>
         <h2>Nous trouver</h2>
-        <p>L'atelier est situé au cœur de Paris, facilement accessible en transport en commun.</p>
-        <div className="map-placeholder">
-          🗺️ Carte interactive (à intégrer avec Google Maps)
+        <p>L'atelier est situé à Balgau, dans le Grand Est.</p>
+        <div className="map-container">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d42773.372389584365!2d7.491705290908911!3d47.929888393538555!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47910cb26838ea6f%3A0xa6fd7edd1e0c4d43!2s68740%20Balgau!5e0!3m2!1sfr!2sfr!4v1760987316884!5m2!1sfr!2sfr"
+            width="100%"
+            height="300"
+            style={{ border: 0, borderRadius: '15px' }}
+            allowFullScreen=""
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Localisation de L'Atelier de Patrick à Balgau"
+          ></iframe>
         </div>
       </MapSection>
     </ContactContainer>

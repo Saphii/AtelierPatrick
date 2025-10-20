@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import { FaHammer, FaCube, FaArrowRight, FaStar } from 'react-icons/fa';
+import { FaHammer, FaCube, FaArrowRight, FaStar, FaPen } from 'react-icons/fa';
 
 const HomeContainer = styled.div`
   max-width: 1200px;
@@ -438,7 +438,7 @@ const Home = () => {
               Mobilier sur mesure, objets décoratifs, sculptures... 
               Chaque création en bois est unique et réalisée selon vos souhaits.
             </p>
-            <div className="price">Devis gratuit</div>
+            <div className="price">Sur mesure</div>
           </ServiceCard>
           
           <ServiceCard>
@@ -450,7 +450,7 @@ const Home = () => {
               Prototypage rapide, pièces techniques, objets décoratifs... 
               L'impression 3D pour donner vie à vos idées les plus créatives.
             </p>
-            <div className="price">À partir de 5€</div>
+            <div className="price">Sur mesure</div>
           </ServiceCard>
           
           <ServiceCard>
@@ -464,42 +464,21 @@ const Home = () => {
             </p>
             <div className="price">Sur mesure</div>
           </ServiceCard>
+          
+          <ServiceCard>
+            <div className="icon">
+              <FaPen />
+            </div>
+            <h3>Gravure</h3>
+            <p>
+              Gravure personnalisée sur bois, métal ou autres matériaux. 
+              Textes, logos, motifs décoratifs pour des créations uniques.
+            </p>
+            <div className="price">Sur mesure</div>
+          </ServiceCard>
         </ServicesGrid>
       </ServicesSection>
 
-      <TestimonialsSection>
-        <div className="testimonials-content">
-          <SectionTitle>Ce que disent nos clients</SectionTitle>
-          <TestimonialsGrid>
-            <TestimonialCard>
-              <div className="stars">★★★★★</div>
-              <p className="quote">
-                Un travail exceptionnel ! Patrick a su comprendre exactement 
-                ce que je voulais et l'a réalisé avec une précision remarquable.
-              </p>
-              <div className="author">Marie L.</div>
-            </TestimonialCard>
-            
-            <TestimonialCard>
-              <div className="stars">★★★★★</div>
-              <p className="quote">
-                Service impeccable et créativité au rendez-vous. 
-                Je recommande vivement l'Atelier de Patrick !
-              </p>
-              <div className="author">Jean-Pierre M.</div>
-            </TestimonialCard>
-            
-            <TestimonialCard>
-              <div className="stars">★★★★★</div>
-              <p className="quote">
-                Des créations uniques qui allient tradition et modernité. 
-                Un artisan passionné et à l'écoute.
-              </p>
-              <div className="author">Sophie D.</div>
-            </TestimonialCard>
-          </TestimonialsGrid>
-        </div>
-      </TestimonialsSection>
     </HomeContainer>
   );
 };

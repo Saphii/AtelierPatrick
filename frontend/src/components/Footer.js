@@ -105,7 +105,7 @@ const Footer = () => {
           <h3>Contact</h3>
           <ContactInfo>
             <FaMapMarkerAlt />
-            <span>Adresse de l'atelier</span>
+            <span>Balgau (Alsace)</span>
           </ContactInfo>
           <ContactInfo>
             <FaPhone />
@@ -129,7 +129,7 @@ const Footer = () => {
       </FooterContent>
       
       <FooterBottom>
-        <p>&copy; 2024 L'Atelier de Patrick. Tous droits réservés.</p>
+        <p>&copy; 2025 L'Atelier de Patrick. Tous droits réservés.</p>
       </FooterBottom>
     </FooterContainer>
   );

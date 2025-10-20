@@ -365,6 +365,7 @@ const CreationForm = ({ creation, onClose, onSubmit }) => {
                 <option value="bois">Création Bois</option>
                 <option value="3d">Impression 3D</option>
                 <option value="mixte">Mixte Bois/3D</option>
+                <option value="gravure">Gravure</option>
               </select>
             </div>
 

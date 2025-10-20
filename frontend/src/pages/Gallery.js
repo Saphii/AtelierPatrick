@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FaFilter, FaSearch, FaEye } from 'react-icons/fa';
+import { FaFilter, FaSearch, FaEye, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import axios from 'axios';
 
 const GalleryContainer = styled.div`
@@ -209,12 +209,138 @@ const EmptyState = styled.div`
   }
 `;
 
+const ImageModal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  
+  .modal-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    .close-btn {
+      position: absolute;
+      top: -50px;
+      right: 0;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      padding: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+      }
+    }
+    
+    .image-container {
+      position: relative;
+      max-width: 100%;
+      max-height: 80vh;
+      
+      img {
+        max-width: 100%;
+        max-height: 80vh;
+        object-fit: contain;
+        border-radius: 10px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      }
+      
+      .nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        padding: 15px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+          transform: translateY(-50%) scale(1.1);
+        }
+        
+        &.prev {
+          left: -60px;
+        }
+        
+        &.next {
+          right: -60px;
+        }
+      }
+    }
+    
+    .image-info {
+      margin-top: 20px;
+      text-align: center;
+      color: white;
+      
+      h3 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+      }
+      
+      p {
+        font-size: 1rem;
+        opacity: 0.8;
+        max-width: 500px;
+      }
+      
+      .category {
+        display: inline-block;
+        background: rgba(139, 69, 19, 0.8);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+      }
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .modal-content {
+      .nav-btn {
+        &.prev {
+          left: 10px;
+        }
+        
+        &.next {
+          right: 10px;
+        }
+      }
+    }
+  }
+`;
+
 const Gallery = () => {
   const [creations, setCreations] = useState([]);
   const [filteredCreations, setFilteredCreations] = useState([]);
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     fetchCreations();
@@ -276,7 +402,8 @@ const Gallery = () => {
     const labels = {
       'bois': 'Bois',
       '3d': '3D',
-      'mixte': 'Mixte'
+      'mixte': 'Mixte',
+      'gravure': 'Gravure'
     };
     return labels[category] || category;
   };
@@ -285,6 +412,49 @@ const Gallery = () => {
     if (!Array.isArray(creations)) return 0;
     return creations.filter(creation => creation.category === category).length;
   };
+
+  const openImageModal = (creation, index) => {
+    setSelectedImage(creation);
+    setCurrentImageIndex(index);
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
+    setCurrentImageIndex(0);
+  };
+
+  const navigateImage = (direction) => {
+    const currentList = filteredCreations;
+    let newIndex = currentImageIndex;
+    
+    if (direction === 'prev') {
+      newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : currentList.length - 1;
+    } else {
+      newIndex = currentImageIndex < currentList.length - 1 ? currentImageIndex + 1 : 0;
+    }
+    
+    setCurrentImageIndex(newIndex);
+    setSelectedImage(currentList[newIndex]);
+  };
+
+  const handleKeyPress = (e) => {
+    if (selectedImage) {
+      if (e.key === 'Escape') {
+        closeImageModal();
+      } else if (e.key === 'ArrowLeft') {
+        navigateImage('prev');
+      } else if (e.key === 'ArrowRight') {
+        navigateImage('next');
+      }
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyPress);
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [selectedImage, currentImageIndex]);
 
   if (loading) {
     return (
@@ -343,6 +513,15 @@ const Gallery = () => {
             <span className="count">{getCategoryCount('mixte')}</span>
           )}
         </FilterButton>
+        <FilterButton
+          active={activeFilter === 'gravure'}
+          onClick={() => setActiveFilter('gravure')}
+        >
+          Gravure
+          {getCategoryCount('gravure') > 0 && (
+            <span className="count">{getCategoryCount('gravure')}</span>
+          )}
+        </FilterButton>
       </FiltersSection>
 
       <SearchBar>
@@ -364,11 +543,14 @@ const Gallery = () => {
         </EmptyState>
       ) : (
         <GalleryGrid>
-          {filteredCreations.map(creation => (
+          {filteredCreations.map((creation, index) => (
             <CreationCard key={creation.id}>
               <div className="image-container">
                 <img src={creation.image} alt={creation.title} />
-                <div className="overlay">
+                <div 
+                  className="overlay"
+                  onClick={() => openImageModal(creation, index)}
+                >
                   <FaEye />
                 </div>
               </div>
@@ -383,6 +565,46 @@ const Gallery = () => {
             </CreationCard>
           ))}
         </GalleryGrid>
+      )}
+
+      {selectedImage && (
+        <ImageModal onClick={closeImageModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-btn" onClick={closeImageModal}>
+              <FaTimes />
+            </button>
+            
+            <div className="image-container">
+              <img src={selectedImage.image} alt={selectedImage.title} />
+              
+              {filteredCreations.length > 1 && (
+                <>
+                  <button 
+                    className="nav-btn prev" 
+                    onClick={() => navigateImage('prev')}
+                  >
+                    <FaChevronLeft />
+                  </button>
+                  <button 
+                    className="nav-btn next" 
+                    onClick={() => navigateImage('next')}
+                  >
+                    <FaChevronRight />
+                  </button>
+                </>
+              )}
+            </div>
+            
+            <div className="image-info">
+              <span className="category">{getCategoryLabel(selectedImage.category)}</span>
+              <h3>{selectedImage.title}</h3>
+              <p>{selectedImage.description}</p>
+              {selectedImage.price && (
+                <div className="price">{selectedImage.price.toFixed(2)}€</div>
+              )}
+            </div>
+          </div>
+        </ImageModal>
       )}
     </GalleryContainer>
   );

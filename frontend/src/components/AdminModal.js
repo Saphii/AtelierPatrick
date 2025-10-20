@@ -581,10 +581,6 @@ const AdminModal = ({ onClose, onLoginSuccess, onLogout, isAuthenticated }) => {
                   </div>
                   <h4>Aucune création</h4>
                   <p>Commencez par ajouter votre première création !</p>
-                  <AddButton onClick={handleAddCreation}>
-                    <FaPlus />
-                    Ajouter une création
-                  </AddButton>
                 </EmptyState>
               ) : (
                 <CreationsGrid>

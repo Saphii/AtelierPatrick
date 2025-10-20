@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link, useLocation } from 'react-router-dom';
-import { FaHome, FaImages, FaEnvelope, FaCog, FaSignOutAlt } from 'react-icons/fa';
+import { FaHome, FaImages, FaEnvelope, FaCog, FaSignOutAlt, FaPlus } from 'react-icons/fa';
 
 const HeaderContainer = styled.header`
   background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
@@ -225,6 +225,19 @@ const Header = ({ onAdminClick, isAuthenticated, onLogout }) => {
               <FaEnvelope /> <span>Contact</span>
             </NavLink>
           </li>
+          {isAuthenticated && (
+            <li>
+              <AdminButton 
+                onClick={onAdminClick}
+                isAuthenticated={true}
+                className="authenticated"
+                title="Créer une nouvelle création"
+              >
+                <FaPlus />
+                <span>Créer</span>
+              </AdminButton>
+            </li>
+          )}
           <li>
             <AdminButton 
               onClick={isAuthenticated ? onLogout : onAdminClick}

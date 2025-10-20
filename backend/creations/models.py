@@ -7,6 +7,7 @@ class Creation(models.Model):
         ('bois', 'Création Bois'),
         ('3d', 'Impression 3D'),
         ('mixte', 'Mixte Bois/3D'),
+        ('gravure', 'Gravure'),
     ]
     
     title = models.CharField(max_length=200, verbose_name="Titre")
