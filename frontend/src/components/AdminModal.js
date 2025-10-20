@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { FaTimes, FaPlus, FaEdit, FaTrash, FaSignOutAlt, FaImages, FaEye, FaLock, FaUser, FaEyeSlash } from 'react-icons/fa';
 import { authService, creationService } from '../services/api';
 import CreationForm from './CreationForm';
+import { useCreations } from '../contexts/CreationsContext';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -381,11 +382,10 @@ const EmptyState = styled.div`
 `;
 
 const AdminModal = ({ onClose, onLoginSuccess, onLogout, isAuthenticated }) => {
+  const { creations, loading } = useCreations();
   const [showLogin, setShowLogin] = useState(!isAuthenticated);
-  const [creations, setCreations] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingCreation, setEditingCreation] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
 
   // États pour le formulaire de connexion
@@ -400,32 +400,12 @@ const AdminModal = ({ onClose, onLoginSuccess, onLogout, isAuthenticated }) => {
   useEffect(() => {
     if (isAuthenticated) {
       loadUser();
-      loadCreations();
     }
   }, [isAuthenticated]);
 
   const loadUser = () => {
     const currentUser = authService.getCurrentUser();
     setUser(currentUser);
-  };
-
-  const loadCreations = async () => {
-    try {
-      setLoading(true);
-      const data = await creationService.getAllAdmin();
-      // S'assurer que data est un tableau
-      if (Array.isArray(data)) {
-        setCreations(data);
-      } else {
-        console.error('Les données ne sont pas un tableau:', data);
-        setCreations([]);
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement des créations:', error);
-      setCreations([]);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleLogin = async (e) => {
@@ -466,7 +446,8 @@ const AdminModal = ({ onClose, onLoginSuccess, onLogout, isAuthenticated }) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette création ?')) {
       try {
         await creationService.delete(id);
-        await loadCreations();
+        // Forcer le rafraîchissement du contexte
+        window.dispatchEvent(new CustomEvent('refreshCreations'));
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         alert('Erreur lors de la suppression');
@@ -477,7 +458,8 @@ const AdminModal = ({ onClose, onLoginSuccess, onLogout, isAuthenticated }) => {
   const handleFormSubmit = async () => {
     setShowForm(false);
     setEditingCreation(null);
-    await loadCreations();
+    // Forcer le rafraîchissement du contexte
+    window.dispatchEvent(new CustomEvent('refreshCreations'));
   };
 
   const getCategoryLabel = (category) => {

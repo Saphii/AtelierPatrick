@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaTimes, FaUpload, FaImage, FaSave } from 'react-icons/fa';
 import { creationService } from '../services/api';
+import { useCreations } from '../contexts/CreationsContext';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -232,6 +233,7 @@ const FormActions = styled.div`
 `;
 
 const CreationForm = ({ creation, onClose, onSubmit }) => {
+  const { refreshCreations } = useCreations();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -295,6 +297,10 @@ const CreationForm = ({ creation, onClose, onSubmit }) => {
       } else {
         await creationService.create(formData);
       }
+      
+      // Forcer le rafraîchissement du contexte
+      window.dispatchEvent(new CustomEvent('refreshCreations'));
+      
       onSubmit();
     } catch (error) {
       setError(error.message || 'Erreur lors de la sauvegarde');

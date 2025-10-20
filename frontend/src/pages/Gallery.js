@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FaFilter, FaSearch, FaEye, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import axios from 'axios';
+import { FaFilter, FaSearch, FaEye, FaTimes, FaChevronLeft, FaChevronRight, FaEdit, FaTrash } from 'react-icons/fa';
+import { useCreations } from '../contexts/CreationsContext';
 
 const GalleryContainer = styled.div`
   max-width: 1200px;
@@ -149,6 +149,7 @@ const CreationCard = styled.div`
       justify-content: center;
       opacity: 0;
       transition: opacity 0.3s ease;
+      z-index: 5;
       
       svg {
         color: white;
@@ -191,6 +192,55 @@ const CreationCard = styled.div`
       font-weight: 600;
       color: #8B4513;
     }
+  }
+  
+  .admin-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+    
+    button {
+      background: rgba(0, 0, 0, 0.7);
+      border: none;
+      color: white;
+      padding: 8px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      &:hover {
+        background: rgba(0, 0, 0, 0.9);
+        transform: scale(1.1);
+      }
+      
+      &.edit-btn {
+        background: rgba(33, 150, 243, 0.8);
+        
+        &:hover {
+          background: rgba(33, 150, 243, 1);
+        }
+      }
+      
+      &.delete-btn {
+        background: rgba(244, 67, 54, 0.8);
+        
+        &:hover {
+          background: rgba(244, 67, 54, 1);
+        }
+      }
+    }
+  }
+  
+  &:hover .admin-actions {
+    opacity: 1;
   }
 `;
 
@@ -333,45 +383,17 @@ const ImageModal = styled.div`
   }
 `;
 
-const Gallery = () => {
-  const [creations, setCreations] = useState([]);
+const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
+  const { creations, loading } = useCreations();
   const [filteredCreations, setFilteredCreations] = useState([]);
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
-    fetchCreations();
-  }, []);
-
-  useEffect(() => {
     filterCreations();
   }, [creations, activeFilter, searchTerm]);
-
-  const fetchCreations = async () => {
-    try {
-      const response = await axios.get('/api/creations/');
-      console.log('Données reçues:', response.data);
-      
-      // S'assurer que les données sont un tableau
-      if (Array.isArray(response.data)) {
-        setCreations(response.data);
-      } else if (response.data && Array.isArray(response.data.results)) {
-        // Si c'est une réponse paginée
-        setCreations(response.data.results);
-      } else {
-        console.error('Format de données inattendu:', response.data);
-        setCreations([]);
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement des créations:', error);
-      setCreations([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const filterCreations = () => {
     // S'assurer que creations est un tableau
@@ -411,6 +433,18 @@ const Gallery = () => {
   const getCategoryCount = (category) => {
     if (!Array.isArray(creations)) return 0;
     return creations.filter(creation => creation.category === category).length;
+  };
+
+  const handleEditCreation = (creation) => {
+    if (onEditCreation) {
+      onEditCreation(creation);
+    }
+  };
+
+  const handleDeleteCreation = (creation) => {
+    if (onDeleteCreation) {
+      onDeleteCreation(creation);
+    }
   };
 
   const openImageModal = (creation, index) => {
@@ -547,6 +581,26 @@ const Gallery = () => {
             <CreationCard key={creation.id}>
               <div className="image-container">
                 <img src={creation.image} alt={creation.title} />
+                
+                {isAuthenticated && (
+                  <div className="admin-actions">
+                    <button 
+                      className="edit-btn"
+                      onClick={() => handleEditCreation(creation)}
+                      title="Modifier cette création"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button 
+                      className="delete-btn"
+                      onClick={() => handleDeleteCreation(creation)}
+                      title="Supprimer cette création"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                )}
+                
                 <div 
                   className="overlay"
                   onClick={() => openImageModal(creation, index)}

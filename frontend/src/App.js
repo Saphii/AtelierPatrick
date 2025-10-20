@@ -6,8 +6,11 @@ import Home from './pages/Home';
 import Gallery from './pages/Gallery';
 import Contact from './pages/Contact';
 import AdminModal from './components/AdminModal';
+import CreationForm from './components/CreationForm';
+import ConfirmationModal from './components/ConfirmationModal';
 import Footer from './components/Footer';
-import { authService } from './services/api';
+import { CreationsProvider } from './contexts/CreationsContext';
+import { authService, creationService } from './services/api';
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -58,6 +61,10 @@ const MainContent = styled.main`
 
 function App() {
   const [showAdminModal, setShowAdminModal] = React.useState(false);
+  const [showCreationForm, setShowCreationForm] = React.useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = React.useState(false);
+  const [editingCreation, setEditingCreation] = React.useState(null);
+  const [deletingCreation, setDeletingCreation] = React.useState(null);
   const [isAuthenticated, setIsAuthenticated] = React.useState(authService.isAuthenticated());
 
   const handleLoginSuccess = () => {
@@ -67,36 +74,109 @@ function App() {
   const handleLogout = () => {
     setIsAuthenticated(false);
     setShowAdminModal(false);
+    setShowCreationForm(false);
+    setShowConfirmationModal(false);
+    setEditingCreation(null);
+    setDeletingCreation(null);
+  };
+
+  const handleCreateClick = () => {
+    setEditingCreation(null);
+    setShowCreationForm(true);
+  };
+
+  const handleEditCreation = (creation) => {
+    setEditingCreation(creation);
+    setShowCreationForm(true);
+  };
+
+  const handleDeleteClick = (creation) => {
+    setDeletingCreation(creation);
+    setShowConfirmationModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingCreation) return;
+    
+    try {
+      await creationService.delete(deletingCreation.id);
+      // Forcer le rafraîchissement du contexte
+      window.dispatchEvent(new CustomEvent('refreshCreations'));
+      setDeletingCreation(null);
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error);
+      alert('Erreur lors de la suppression de la création');
+    }
+  };
+
+  const handleCreationFormClose = () => {
+    setShowCreationForm(false);
+    setEditingCreation(null);
+  };
+
+  const handleCreationFormSuccess = () => {
+    setShowCreationForm(false);
+    setEditingCreation(null);
+    // Le contexte va automatiquement mettre à jour la liste
   };
 
   return (
-    <Router>
-      <GlobalStyle />
-      <AppContainer>
-        <Header 
-          onAdminClick={() => setShowAdminModal(true)}
-          isAuthenticated={isAuthenticated}
-          onLogout={handleLogout}
-        />
-        <MainContent>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/galerie" element={<Gallery />} />
-            <Route path="/contact" element={<Contact />} />
-          </Routes>
-        </MainContent>
-        <Footer />
-        
-        {showAdminModal && (
-          <AdminModal
-            onClose={() => setShowAdminModal(false)}
-            onLoginSuccess={handleLoginSuccess}
-            onLogout={handleLogout}
+    <CreationsProvider>
+      <Router>
+        <GlobalStyle />
+        <AppContainer>
+          <Header 
+            onAdminClick={() => setShowAdminModal(true)}
+            onCreateClick={handleCreateClick}
             isAuthenticated={isAuthenticated}
+            onLogout={handleLogout}
           />
-        )}
-      </AppContainer>
-    </Router>
+          <MainContent>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/galerie" element={
+                <Gallery 
+                  isAuthenticated={isAuthenticated}
+                  onEditCreation={handleEditCreation}
+                  onDeleteCreation={handleDeleteClick}
+                />
+              } />
+              <Route path="/contact" element={<Contact />} />
+            </Routes>
+          </MainContent>
+          <Footer />
+          
+          {showAdminModal && (
+            <AdminModal
+              onClose={() => setShowAdminModal(false)}
+              onLoginSuccess={handleLoginSuccess}
+              onLogout={handleLogout}
+              isAuthenticated={isAuthenticated}
+            />
+          )}
+          
+          {showCreationForm && (
+            <CreationForm
+              creation={editingCreation}
+              onClose={handleCreationFormClose}
+              onSuccess={handleCreationFormSuccess}
+            />
+          )}
+          
+          {showConfirmationModal && (
+            <ConfirmationModal
+              isOpen={showConfirmationModal}
+              onClose={() => {
+                setShowConfirmationModal(false);
+                setDeletingCreation(null);
+              }}
+              onConfirm={handleDeleteConfirm}
+              creationTitle={deletingCreation?.title || ''}
+            />
+          )}
+        </AppContainer>
+      </Router>
+    </CreationsProvider>
   );
 }
 

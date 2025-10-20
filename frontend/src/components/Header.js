@@ -184,7 +184,7 @@ const AdminButton = styled.button`
   }
 `;
 
-const Header = ({ onAdminClick, isAuthenticated, onLogout }) => {
+const Header = ({ onAdminClick, onCreateClick, isAuthenticated, onLogout }) => {
   const location = useLocation();
   
   return (
@@ -228,7 +228,7 @@ const Header = ({ onAdminClick, isAuthenticated, onLogout }) => {
           {isAuthenticated && (
             <li>
               <AdminButton 
-                onClick={onAdminClick}
+                onClick={onCreateClick}
                 isAuthenticated={true}
                 className="authenticated"
                 title="Créer une nouvelle création"
