@@ -1,8 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { FaPlus, FaEdit, FaTrash, FaSignOutAlt, FaImages, FaEye } from 'react-icons/fa';
-import { authService, creationService } from '../services/api';
-import CreationForm from './CreationForm';
+import React, { useEffect, useState } from "react";
+import {
+  FaEdit,
+  FaImages,
+  FaPlus,
+  FaSignOutAlt,
+  FaTrash,
+} from "react-icons/fa";
+import styled from "styled-components";
+import CreationForm from "../components/CreationForm";
+import { authService, creationService } from "../services/api";
 
 const AdminContainer = styled.div`
   min-height: 100vh;
@@ -10,7 +16,7 @@ const AdminContainer = styled.div`
 `;
 
 const AdminHeader = styled.header`
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
   color: white;
   padding: 20px 0;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -30,7 +36,7 @@ const HeaderTitle = styled.div`
     font-size: 2rem;
     margin-bottom: 5px;
   }
-  
+
   p {
     opacity: 0.9;
     font-size: 1rem;
@@ -41,7 +47,7 @@ const HeaderActions = styled.div`
   display: flex;
   gap: 15px;
   align-items: center;
-  
+
   .user-info {
     background: rgba(255, 255, 255, 0.1);
     padding: 10px 15px;
@@ -61,7 +67,7 @@ const LogoutButton = styled.button`
   display: flex;
   align-items: center;
   gap: 8px;
-  
+
   &:hover {
     background: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
@@ -79,15 +85,15 @@ const AdminActions = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 40px;
-  
+
   h2 {
-    color: #8B4513;
+    color: #8b4513;
     font-size: 2rem;
   }
 `;
 
 const AddButton = styled.button`
-  background: linear-gradient(135deg, #8B4513, #A0522D);
+  background: linear-gradient(135deg, #8b4513, #a0522d);
   color: white;
   border: none;
   padding: 15px 25px;
@@ -98,7 +104,7 @@ const AddButton = styled.button`
   display: flex;
   align-items: center;
   gap: 10px;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 25px rgba(139, 69, 19, 0.3);
@@ -117,23 +123,23 @@ const CreationCard = styled.div`
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   }
-  
+
   .image-container {
     position: relative;
     height: 200px;
     overflow: hidden;
-    
+
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-    
+
     .overlay {
       position: absolute;
       top: 0;
@@ -146,11 +152,11 @@ const CreationCard = styled.div`
       justify-content: center;
       opacity: 0;
       transition: opacity 0.3s ease;
-      
+
       .actions {
         display: flex;
         gap: 15px;
-        
+
         button {
           background: white;
           border: none;
@@ -158,71 +164,71 @@ const CreationCard = styled.div`
           border-radius: 50%;
           cursor: pointer;
           transition: all 0.3s ease;
-          
+
           &:hover {
             transform: scale(1.1);
           }
-          
+
           &.edit {
-            color: #8B4513;
+            color: #8b4513;
           }
-          
+
           &.delete {
             color: #dc3545;
           }
         }
       }
     }
-    
+
     &:hover .overlay {
       opacity: 1;
     }
   }
-  
+
   .content {
     padding: 20px;
-    
+
     .category {
       display: inline-block;
       background: #f0f0f0;
-      color: #8B4513;
+      color: #8b4513;
       padding: 5px 12px;
       border-radius: 15px;
       font-size: 0.8rem;
       font-weight: 500;
       margin-bottom: 10px;
     }
-    
+
     h3 {
       font-size: 1.2rem;
       margin-bottom: 10px;
       color: #333;
     }
-    
+
     p {
       color: #666;
       font-size: 0.9rem;
       line-height: 1.5;
       margin-bottom: 15px;
     }
-    
+
     .price {
       font-size: 1.1rem;
       font-weight: 600;
-      color: #8B4513;
+      color: #8b4513;
     }
-    
+
     .status {
       margin-top: 10px;
       font-size: 0.8rem;
       padding: 5px 10px;
       border-radius: 10px;
-      
+
       &.available {
         background: #d4edda;
         color: #155724;
       }
-      
+
       &.unavailable {
         background: #f8d7da;
         color: #721c24;
@@ -235,18 +241,18 @@ const EmptyState = styled.div`
   text-align: center;
   padding: 80px 20px;
   color: #666;
-  
+
   .icon {
     font-size: 4rem;
-    color: #8B4513;
+    color: #8b4513;
     margin-bottom: 20px;
   }
-  
+
   h3 {
     font-size: 1.5rem;
     margin-bottom: 15px;
   }
-  
+
   p {
     font-size: 1.1rem;
     margin-bottom: 30px;
@@ -273,9 +279,15 @@ const Admin = () => {
   const loadCreations = async () => {
     try {
       const data = await creationService.getAllAdmin();
-      setCreations(data);
+      if (Array.isArray(data?.results)) {
+        setCreations(data.results);
+      } else if (Array.isArray(data)) {
+        setCreations(data);
+      } else {
+        setCreations([]);
+      }
     } catch (error) {
-      console.error('Erreur lors du chargement des créations:', error);
+      console.error("Erreur lors du chargement des créations:", error);
     } finally {
       setLoading(false);
     }
@@ -297,13 +309,13 @@ const Admin = () => {
   };
 
   const handleDeleteCreation = async (id) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette création ?')) {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer cette création ?")) {
       try {
         await creationService.delete(id);
         await loadCreations();
       } catch (error) {
-        console.error('Erreur lors de la suppression:', error);
-        alert('Erreur lors de la suppression');
+        console.error("Erreur lors de la suppression:", error);
+        alert("Erreur lors de la suppression");
       }
     }
   };
@@ -316,9 +328,9 @@ const Admin = () => {
 
   const getCategoryLabel = (category) => {
     const labels = {
-      'bois': 'Bois',
-      '3d': '3D',
-      'mixte': 'Mixte'
+      bois: "Bois",
+      "3d": "3D",
+      mixte: "Mixte",
     };
     return labels[category] || category;
   };
@@ -326,7 +338,7 @@ const Admin = () => {
   if (loading) {
     return (
       <AdminContainer>
-        <div style={{ textAlign: 'center', padding: '100px 20px' }}>
+        <div style={{ textAlign: "center", padding: "100px 20px" }}>
           <h2>Chargement...</h2>
         </div>
       </AdminContainer>
@@ -376,26 +388,27 @@ const Admin = () => {
           </EmptyState>
         ) : (
           <CreationsGrid>
-            {creations.map(creation => (
+            {creations.map((creation) => (
               <CreationCard key={creation.id}>
                 <div className="image-container">
-                  <img 
-                    src={creation.image} 
+                  <img
+                    src={creation.image}
                     alt={creation.title}
                     onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/300x200?text=Image+non+disponible';
+                      e.target.src =
+                        "https://via.placeholder.com/300x200?text=Image+non+disponible";
                     }}
                   />
                   <div className="overlay">
                     <div className="actions">
-                      <button 
+                      <button
                         className="edit"
                         onClick={() => handleEditCreation(creation)}
                         title="Modifier"
                       >
                         <FaEdit />
                       </button>
-                      <button 
+                      <button
                         className="delete"
                         onClick={() => handleDeleteCreation(creation.id)}
                         title="Supprimer"
@@ -406,14 +419,20 @@ const Admin = () => {
                   </div>
                 </div>
                 <div className="content">
-                  <span className="category">{getCategoryLabel(creation.category)}</span>
+                  <span className="category">
+                    {getCategoryLabel(creation.category)}
+                  </span>
                   <h3>{creation.title}</h3>
                   <p>{creation.description}</p>
                   {creation.price && (
                     <div className="price">{creation.price}€</div>
                   )}
-                  <div className={`status ${creation.is_available ? 'available' : 'unavailable'}`}>
-                    {creation.is_available ? 'Disponible' : 'Non disponible'}
+                  <div
+                    className={`status ${
+                      creation.is_available ? "available" : "unavailable"
+                    }`}
+                  >
+                    {creation.is_available ? "Disponible" : "Non disponible"}
                   </div>
                 </div>
               </CreationCard>
