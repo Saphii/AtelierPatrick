@@ -1,6 +1,7 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL || "http://217.154.172.35/api";
 
 // Configuration d'axios avec le token d'authentification
 const api = axios.create({
@@ -10,7 +11,7 @@ const api = axios.create({
 // Intercepteur pour ajouter le token d'authentification
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem("authToken");
     if (token) {
       config.headers.Authorization = `Token ${token}`;
     }
@@ -29,52 +30,56 @@ export const authService = {
         username,
         password,
       });
-      
+
       if (response.data.token) {
-        localStorage.setItem('authToken', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem("authToken", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
       }
-      
+
       return response.data;
     } catch (error) {
-      throw error.response?.data || { error: 'Erreur de connexion' };
+      throw error.response?.data || { error: "Erreur de connexion" };
     }
   },
 
   logout: async () => {
     try {
-      await api.post('/auth/logout/');
+      await api.post("/auth/logout/");
     } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error);
+      console.error("Erreur lors de la déconnexion:", error);
     } finally {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("user");
     }
   },
 
   getUserInfo: async () => {
     try {
-      const response = await api.get('/auth/user/');
+      const response = await api.get("/auth/user/");
       return response.data;
     } catch (error) {
-      throw error.response?.data || { error: 'Erreur lors de la récupération des informations' };
+      throw (
+        error.response?.data || {
+          error: "Erreur lors de la récupération des informations",
+        }
+      );
     }
   },
 
   isAuthenticated: () => {
-    return !!localStorage.getItem('authToken');
+    return !!localStorage.getItem("authToken");
   },
 
   getCurrentUser: () => {
-    const user = localStorage.getItem('user');
+    const user = localStorage.getItem("user");
     return user ? JSON.parse(user) : null;
-  }
+  },
 };
 
 // Service pour les créations
 export const creationService = {
   getAll: async () => {
-    const response = await api.get('/creations/');
+    const response = await api.get("/creations/");
     return response.data;
   },
 
@@ -85,17 +90,17 @@ export const creationService = {
 
   create: async (creationData) => {
     const formData = new FormData();
-    
+
     // Ajouter tous les champs au FormData
-    Object.keys(creationData).forEach(key => {
+    Object.keys(creationData).forEach((key) => {
       if (creationData[key] !== null && creationData[key] !== undefined) {
         formData.append(key, creationData[key]);
       }
     });
 
-    const response = await api.post('/admin/creations/', formData, {
+    const response = await api.post("/admin/creations/", formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
     return response.data;
@@ -103,9 +108,9 @@ export const creationService = {
 
   update: async (id, creationData) => {
     const formData = new FormData();
-    
+
     // Ajouter tous les champs au FormData
-    Object.keys(creationData).forEach(key => {
+    Object.keys(creationData).forEach((key) => {
       if (creationData[key] !== null && creationData[key] !== undefined) {
         formData.append(key, creationData[key]);
       }
@@ -113,7 +118,7 @@ export const creationService = {
 
     const response = await api.patch(`/admin/creations/${id}/`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
     return response.data;
@@ -125,9 +130,9 @@ export const creationService = {
   },
 
   getAllAdmin: async () => {
-    const response = await api.get('/admin/creations/');
+    const response = await api.get("/admin/creations/");
     return response.data;
-  }
+  },
 };
 
 export default api;
