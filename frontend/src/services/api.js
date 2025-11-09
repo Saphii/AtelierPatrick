@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL =
-  process.env.REACT_APP_API_URL || "http://217.154.172.35/api";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "/api";
 
 // Configuration d'axios avec le token d'authentification
 const api = axios.create({
