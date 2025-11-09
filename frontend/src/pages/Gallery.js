@@ -430,6 +430,13 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
     return labels[category] || category;
   };
 
+  const formatPrice = (price) => {
+    if (!price) return null;
+    const numPrice = Number(price);
+    if (isNaN(numPrice)) return null;
+    return numPrice.toFixed(2);
+  };
+
   const getCategoryCount = (category) => {
     if (!Array.isArray(creations)) return 0;
     return creations.filter(creation => creation.category === category).length;
@@ -612,8 +619,8 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
                 <span className="category">{getCategoryLabel(creation.category)}</span>
                 <h3>{creation.title}</h3>
                 <p>{creation.description}</p>
-                {creation.price && (
-                  <div className="price">{creation.price.toFixed(2)}€</div>
+                {creation.price && formatPrice(creation.price) && (
+                  <div className="price">{formatPrice(creation.price)}€</div>
                 )}
               </div>
             </CreationCard>
@@ -653,8 +660,8 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
               <span className="category">{getCategoryLabel(selectedImage.category)}</span>
               <h3>{selectedImage.title}</h3>
               <p>{selectedImage.description}</p>
-              {selectedImage.price && (
-                <div className="price">{selectedImage.price.toFixed(2)}€</div>
+              {selectedImage.price && formatPrice(selectedImage.price) && (
+                <div className="price">{formatPrice(selectedImage.price)}€</div>
               )}
             </div>
           </div>
