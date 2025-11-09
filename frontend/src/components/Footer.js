@@ -88,17 +88,17 @@ const Footer = () => {
           <h3>L'Atelier de Patrick</h3>
           <p>
             Spécialisé dans les créations en bois et les impressions 3D, 
-            Patrick vous accompagne dans vos projets personnalisés avec 
-            passion et savoir-faire artisanal.
+            Patrick vous partage ses projets personnalisés avec 
+            passion et savoir-faire.
           </p>
-          <SocialLinks>
+          {/* <SocialLinks>
             <a href="#" aria-label="Facebook">
               <FaFacebook />
             </a>
             <a href="#" aria-label="Instagram">
               <FaInstagram />
             </a>
-          </SocialLinks>
+          </SocialLinks> */}
         </FooterSection>
         
         <FooterSection>
@@ -107,13 +107,14 @@ const Footer = () => {
             <FaMapMarkerAlt />
             <span>Balgau (Alsace)</span>
           </ContactInfo>
-          <ContactInfo>
+          {/* <ContactInfo>
             <FaPhone />
             <span>06 XX XX XX XX</span>
-          </ContactInfo>
+          </ContactInfo> */}
           <ContactInfo>
             <FaEnvelope />
-            <span>contact@atelier-patrick.fr</span>
+            <span>atelierdepatrick68@gmail.com
+            </span>
           </ContactInfo>
         </FooterSection>
         
@@ -123,7 +124,7 @@ const Footer = () => {
             <li>• Créations sur mesure en bois</li>
             <li>• Impressions 3D personnalisées</li>
             <li>• Réparations et restaurations</li>
-            <li>• Conseils et devis gratuits</li>
+            <li>• Conseils </li>
           </ul>
         </FooterSection>
       </FooterContent>

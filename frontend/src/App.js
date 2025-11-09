@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
 import Header from './components/Header';
 import Home from './pages/Home';
@@ -58,6 +58,20 @@ const AppContainer = styled.div`
 const MainContent = styled.main`
   flex: 1;
 `;
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto'
+    });
+  }, [pathname]);
+
+  return null;
+};
 
 function App() {
   const [showAdminModal, setShowAdminModal] = React.useState(false);
@@ -123,6 +137,7 @@ function App() {
   return (
     <CreationsProvider>
       <Router>
+        <ScrollToTop />
         <GlobalStyle />
         <AppContainer>
           <Header 

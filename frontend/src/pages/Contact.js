@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaClock, FaCheckCircle } from 'react-icons/fa';
-import axios from 'axios';
+import emailjs from '@emailjs/browser';
 
 const ContactContainer = styled.div`
   max-width: 1200px;
@@ -225,7 +225,31 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      await axios.post('/api/contact/', formData);
+      const serviceId = 'service_yppd38k';
+      const templateId = 'template_7v7sk5n';
+      const publicKey = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
+
+      if (!publicKey) {
+        throw new Error(
+          "Clé publique EmailJS manquante. Veuillez définir la variable d'environnement REACT_APP_EMAILJS_PUBLIC_KEY."
+        );
+      }
+
+      await emailjs.send(
+        serviceId,
+        templateId,
+        {
+          title: formData.subject,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          subject: formData.subject,
+          message: formData.message
+        },
+        {
+          publicKey
+        }
+      );
       setIsSubmitted(true);
       setFormData({
         name: '',
