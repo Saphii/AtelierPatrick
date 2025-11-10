@@ -15,7 +15,7 @@ import { resolveImageUrl } from "../services/api";
 
 const GalleryContainer = styled.div`
   background: linear-gradient(180deg, #f7f3ef 0%, #ffffff 100%);
-  padding: 80px 0 120px;
+  padding: 48px 0 96px;
 `;
 
 const GalleryInner = styled.div`
@@ -26,7 +26,7 @@ const GalleryInner = styled.div`
 
 const GalleryHeader = styled.header`
   text-align: center;
-  margin-bottom: 56px;
+  margin-bottom: 40px;
 
   h1 {
     font-size: 2.75rem;
@@ -281,33 +281,9 @@ const CardDescription = styled.p`
   flex: 1;
 `;
 
-const CardFooter = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: auto;
-`;
-
-const PriceTag = styled.span`
-  background: rgba(139, 69, 19, 0.1);
-  color: #8b4513;
-  padding: 6px 12px;
-  border-radius: 12px;
-  font-weight: 600;
-`;
-
-const StatusBadge = styled.span`
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 12px;
-  background: ${(props) => (props.available ? "#d7f4df" : "#ffe1e1")};
-  color: ${(props) => (props.available ? "#1f7a3f" : "#a43030")};
-`;
-
 const EmptyState = styled.div`
   text-align: center;
-  padding: 100px 20px;
+  padding: 120px 20px;
   color: #7a6a5f;
 
   h3 {
@@ -496,13 +472,6 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
       gravure: "Gravure",
     };
     return labels[category] || category;
-  };
-
-  const formatPrice = (price) => {
-    if (!price) return null;
-    const numPrice = Number(price);
-    if (isNaN(numPrice)) return null;
-    return numPrice.toFixed(2);
   };
 
   const getCategoryCount = (category) => {
@@ -708,16 +677,6 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
                 <CardContent>
                   <CardTitle>{creation.title}</CardTitle>
                   <CardDescription>{creation.description}</CardDescription>
-                  <CardFooter>
-                    {creation.price && formatPrice(creation.price) ? (
-                      <PriceTag>{formatPrice(creation.price)}€</PriceTag>
-                    ) : (
-                      <PriceTag>Sur devis</PriceTag>
-                    )}
-                    <StatusBadge available={creation.is_available}>
-                      {creation.is_available ? "Disponible" : "Non disponible"}
-                    </StatusBadge>
-                  </CardFooter>
                 </CardContent>
               </CreationCard>
             ))}
@@ -761,11 +720,6 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
                 </span>
                 <h3>{selectedImage.title}</h3>
                 <p>{selectedImage.description}</p>
-                {selectedImage.price && formatPrice(selectedImage.price) && (
-                  <div className="price">
-                    {formatPrice(selectedImage.price)}€
-                  </div>
-                )}
               </div>
             </div>
           </ImageModal>
