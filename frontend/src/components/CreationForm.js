@@ -232,7 +232,7 @@ const FormActions = styled.div`
   }
 `;
 
-const CreationForm = ({ creation, onClose, onSubmit }) => {
+const CreationForm = ({ creation, onClose, onSubmit, onSuccess }) => {
   const { refreshCreations } = useCreations();
   const [formData, setFormData] = useState({
     title: '',
@@ -309,12 +309,17 @@ const CreationForm = ({ creation, onClose, onSubmit }) => {
 
       // Forcer le rafraîchissement du contexte
       window.dispatchEvent(new CustomEvent('refreshCreations'));
+      refreshCreations();
 
-      onSubmit({
-        message,
-        creation: returnedCreation,
-        mode: creation ? 'update' : 'create',
-      });
+      if (typeof onSubmit === 'function') {
+        onSubmit({
+          message,
+          creation: returnedCreation,
+          mode: creation ? 'update' : 'create',
+        });
+      } else if (typeof onSuccess === 'function') {
+        onSuccess();
+      }
     } catch (error) {
       setError(error.message || 'Erreur lors de la sauvegarde');
     } finally {
