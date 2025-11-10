@@ -42,8 +42,32 @@ class AdminCreationViewSet(viewsets.ModelViewSet):
     serializer_class = CreationSerializer
     permission_classes = [IsAuthenticated]
     
+    @staticmethod
+    def _normalize_boolean(value, default=False):
+        if value is None or value == '':
+            return default
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, (int, float)):
+            return bool(value)
+        if isinstance(value, str):
+            return value.lower() in ['true', '1', 'yes', 'y', 'on']
+        return default
+
+    def _prepare_data(self, request, default_available=True):
+        data = request.data.copy()
+        if 'is_available' not in data:
+            data['is_available'] = default_available
+        else:
+            data['is_available'] = self._normalize_boolean(
+                data.get('is_available'),
+                default=default_available
+            )
+        return data
+
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        data = self._prepare_data(request, default_available=True)
+        serializer = self.get_serializer(data=data)
         if serializer.is_valid():
             creation = serializer.save()
             return Response(
@@ -58,7 +82,8 @@ class AdminCreationViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        data = self._prepare_data(request, default_available=instance.is_available)
+        serializer = self.get_serializer(instance, data=data, partial=partial)
         if serializer.is_valid():
             creation = serializer.save()
             return Response(
