@@ -1,8 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { FaFilter, FaSearch, FaEye, FaTimes, FaChevronLeft, FaChevronRight, FaEdit, FaTrash } from 'react-icons/fa';
-import { useCreations } from '../contexts/CreationsContext';
-import { resolveImageUrl } from '../services/api';
+import React, { useEffect, useState } from "react";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaEdit,
+  FaEye,
+  FaFilter,
+  FaSearch,
+  FaTimes,
+  FaTrash,
+} from "react-icons/fa";
+import styled from "styled-components";
+import { useCreations } from "../contexts/CreationsContext";
+import { resolveImageUrl } from "../services/api";
 
 const GalleryContainer = styled.div`
   max-width: 1200px;
@@ -13,12 +22,12 @@ const GalleryContainer = styled.div`
 const GalleryHeader = styled.div`
   text-align: center;
   margin-bottom: 60px;
-  
+
   h1 {
     font-size: 2.5rem;
     margin-bottom: 20px;
   }
-  
+
   p {
     font-size: 1.2rem;
     color: #666;
@@ -38,25 +47,25 @@ const FiltersSection = styled.div`
 const FilterButton = styled.button`
   padding: 12px 24px;
   border-radius: 25px;
-  background: ${props => props.active ? '#8B4513' : 'white'};
-  color: ${props => props.active ? 'white' : '#8B4513'};
-  border: 2px solid #8B4513;
+  background: ${(props) => (props.active ? "#8B4513" : "white")};
+  color: ${(props) => (props.active ? "white" : "#8B4513")};
+  border: 2px solid #8b4513;
   font-weight: 500;
   transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
-  
+
   &:hover {
-    background: #8B4513;
+    background: #8b4513;
     color: white;
     transform: translateY(-2px);
   }
-  
+
   .count {
     position: absolute;
     top: -8px;
     right: -8px;
-    background: #A0522D;
+    background: #a0522d;
     color: white;
     border-radius: 50%;
     width: 20px;
@@ -73,7 +82,7 @@ const SearchBar = styled.div`
   display: flex;
   justify-content: center;
   margin-bottom: 40px;
-  
+
   .search-input {
     display: flex;
     align-items: center;
@@ -83,21 +92,21 @@ const SearchBar = styled.div`
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
-    
+
     input {
       flex: 1;
       padding: 15px 10px;
       border: none;
       background: transparent;
       font-size: 1rem;
-      
+
       &::placeholder {
         color: #999;
       }
     }
-    
+
     svg {
-      color: #8B4513;
+      color: #8b4513;
       font-size: 1.2rem;
     }
   }
@@ -116,28 +125,28 @@ const CreationCard = styled.div`
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-10px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   }
-  
+
   .image-container {
     position: relative;
     height: 250px;
     overflow: hidden;
-    
+
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       transition: transform 0.3s ease;
     }
-    
+
     &:hover img {
       transform: scale(1.05);
     }
-    
+
     .overlay {
       position: absolute;
       top: 0;
@@ -151,50 +160,50 @@ const CreationCard = styled.div`
       opacity: 0;
       transition: opacity 0.3s ease;
       z-index: 5;
-      
+
       svg {
         color: white;
         font-size: 2rem;
       }
     }
-    
+
     &:hover .overlay {
       opacity: 1;
     }
   }
-  
+
   .content {
     padding: 25px;
-    
+
     .category {
       display: inline-block;
       background: #f0f0f0;
-      color: #8B4513;
+      color: #8b4513;
       padding: 5px 12px;
       border-radius: 15px;
       font-size: 0.9rem;
       font-weight: 500;
       margin-bottom: 15px;
     }
-    
+
     h3 {
       font-size: 1.3rem;
       margin-bottom: 10px;
     }
-    
+
     p {
       color: #666;
       line-height: 1.6;
       margin-bottom: 15px;
     }
-    
+
     .price {
       font-size: 1.2rem;
       font-weight: 600;
-      color: #8B4513;
+      color: #8b4513;
     }
   }
-  
+
   .admin-actions {
     position: absolute;
     top: 10px;
@@ -204,7 +213,7 @@ const CreationCard = styled.div`
     opacity: 0;
     transition: opacity 0.3s ease;
     z-index: 10;
-    
+
     button {
       background: rgba(0, 0, 0, 0.7);
       border: none;
@@ -216,30 +225,30 @@ const CreationCard = styled.div`
       display: flex;
       align-items: center;
       justify-content: center;
-      
+
       &:hover {
         background: rgba(0, 0, 0, 0.9);
         transform: scale(1.1);
       }
-      
+
       &.edit-btn {
         background: rgba(33, 150, 243, 0.8);
-        
+
         &:hover {
           background: rgba(33, 150, 243, 1);
         }
       }
-      
+
       &.delete-btn {
         background: rgba(244, 67, 54, 0.8);
-        
+
         &:hover {
           background: rgba(244, 67, 54, 1);
         }
       }
     }
   }
-  
+
   &:hover .admin-actions {
     opacity: 1;
   }
@@ -249,12 +258,12 @@ const EmptyState = styled.div`
   text-align: center;
   padding: 80px 20px;
   color: #666;
-  
+
   h3 {
     font-size: 1.5rem;
     margin-bottom: 20px;
   }
-  
+
   p {
     font-size: 1.1rem;
   }
@@ -272,7 +281,7 @@ const ImageModal = styled.div`
   justify-content: center;
   z-index: 1000;
   padding: 20px;
-  
+
   .modal-content {
     position: relative;
     max-width: 90vw;
@@ -280,7 +289,7 @@ const ImageModal = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    
+
     .close-btn {
       position: absolute;
       top: -50px;
@@ -293,18 +302,18 @@ const ImageModal = styled.div`
       border-radius: 50%;
       cursor: pointer;
       transition: all 0.3s ease;
-      
+
       &:hover {
         background: rgba(255, 255, 255, 0.3);
         transform: scale(1.1);
       }
     }
-    
+
     .image-container {
       position: relative;
       max-width: 100%;
       max-height: 80vh;
-      
+
       img {
         max-width: 100%;
         max-height: 80vh;
@@ -312,7 +321,7 @@ const ImageModal = styled.div`
         border-radius: 10px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
       }
-      
+
       .nav-btn {
         position: absolute;
         top: 50%;
@@ -325,38 +334,38 @@ const ImageModal = styled.div`
         border-radius: 50%;
         cursor: pointer;
         transition: all 0.3s ease;
-        
+
         &:hover {
           background: rgba(255, 255, 255, 0.3);
           transform: translateY(-50%) scale(1.1);
         }
-        
+
         &.prev {
           left: -60px;
         }
-        
+
         &.next {
           right: -60px;
         }
       }
     }
-    
+
     .image-info {
       margin-top: 20px;
       text-align: center;
       color: white;
-      
+
       h3 {
         font-size: 1.5rem;
         margin-bottom: 10px;
       }
-      
+
       p {
         font-size: 1rem;
         opacity: 0.8;
         max-width: 500px;
       }
-      
+
       .category {
         display: inline-block;
         background: rgba(139, 69, 19, 0.8);
@@ -368,14 +377,14 @@ const ImageModal = styled.div`
       }
     }
   }
-  
+
   @media (max-width: 768px) {
     .modal-content {
       .nav-btn {
         &.prev {
           left: 10px;
         }
-        
+
         &.next {
           right: 10px;
         }
@@ -387,8 +396,8 @@ const ImageModal = styled.div`
 const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
   const { creations, loading } = useCreations();
   const [filteredCreations, setFilteredCreations] = useState([]);
-  const [activeFilter, setActiveFilter] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -406,15 +415,18 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
     let filtered = creations;
 
     // Filtre par catégorie
-    if (activeFilter !== 'all') {
-      filtered = filtered.filter(creation => creation.category === activeFilter);
+    if (activeFilter !== "all") {
+      filtered = filtered.filter(
+        (creation) => creation.category === activeFilter
+      );
     }
 
     // Filtre par recherche
     if (searchTerm) {
-      filtered = filtered.filter(creation =>
-        creation.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        creation.description.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (creation) =>
+          creation.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          creation.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -423,10 +435,10 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
 
   const getCategoryLabel = (category) => {
     const labels = {
-      'bois': 'Bois',
-      '3d': '3D',
-      'mixte': 'Mixte',
-      'gravure': 'Gravure'
+      bois: "Bois",
+      "3d": "3D",
+      mixte: "Mixte",
+      gravure: "Gravure",
     };
     return labels[category] || category;
   };
@@ -440,7 +452,8 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
 
   const getCategoryCount = (category) => {
     if (!Array.isArray(creations)) return 0;
-    return creations.filter(creation => creation.category === category).length;
+    return creations.filter((creation) => creation.category === category)
+      .length;
   };
 
   const handleEditCreation = (creation) => {
@@ -468,40 +481,42 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
   const navigateImage = (direction) => {
     const currentList = filteredCreations;
     let newIndex = currentImageIndex;
-    
-    if (direction === 'prev') {
-      newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : currentList.length - 1;
+
+    if (direction === "prev") {
+      newIndex =
+        currentImageIndex > 0 ? currentImageIndex - 1 : currentList.length - 1;
     } else {
-      newIndex = currentImageIndex < currentList.length - 1 ? currentImageIndex + 1 : 0;
+      newIndex =
+        currentImageIndex < currentList.length - 1 ? currentImageIndex + 1 : 0;
     }
-    
+
     setCurrentImageIndex(newIndex);
     setSelectedImage(currentList[newIndex]);
   };
 
   const handleKeyPress = (e) => {
     if (selectedImage) {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         closeImageModal();
-      } else if (e.key === 'ArrowLeft') {
-        navigateImage('prev');
-      } else if (e.key === 'ArrowRight') {
-        navigateImage('next');
+      } else if (e.key === "ArrowLeft") {
+        navigateImage("prev");
+      } else if (e.key === "ArrowRight") {
+        navigateImage("next");
       }
     }
   };
 
   useEffect(() => {
-    document.addEventListener('keydown', handleKeyPress);
+    document.addEventListener("keydown", handleKeyPress);
     return () => {
-      document.removeEventListener('keydown', handleKeyPress);
+      document.removeEventListener("keydown", handleKeyPress);
     };
   }, [selectedImage, currentImageIndex]);
 
   if (loading) {
     return (
       <GalleryContainer>
-        <div style={{ textAlign: 'center', padding: '100px 20px' }}>
+        <div style={{ textAlign: "center", padding: "100px 20px" }}>
           <h2>Chargement des créations...</h2>
         </div>
       </GalleryContainer>
@@ -510,18 +525,18 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
 
   return (
     <GalleryContainer>
-      <GalleryHeader>
+      {/* <GalleryHeader>
         <h1>Galerie des Créations</h1>
         <p>
           Découvrez notre collection de créations uniques en bois et impressions 3D. 
           Chaque pièce raconte une histoire et témoigne de notre passion pour l'artisanat.
         </p>
-      </GalleryHeader>
+      </GalleryHeader> */}
 
       <FiltersSection>
         <FilterButton
-          active={activeFilter === 'all'}
-          onClick={() => setActiveFilter('all')}
+          active={activeFilter === "all"}
+          onClick={() => setActiveFilter("all")}
         >
           <FaFilter /> Toutes
           {creations.length > 0 && (
@@ -529,39 +544,39 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
           )}
         </FilterButton>
         <FilterButton
-          active={activeFilter === 'bois'}
-          onClick={() => setActiveFilter('bois')}
+          active={activeFilter === "bois"}
+          onClick={() => setActiveFilter("bois")}
         >
           Créations Bois
-          {getCategoryCount('bois') > 0 && (
-            <span className="count">{getCategoryCount('bois')}</span>
+          {getCategoryCount("bois") > 0 && (
+            <span className="count">{getCategoryCount("bois")}</span>
           )}
         </FilterButton>
         <FilterButton
-          active={activeFilter === '3d'}
-          onClick={() => setActiveFilter('3d')}
+          active={activeFilter === "3d"}
+          onClick={() => setActiveFilter("3d")}
         >
           Impressions 3D
-          {getCategoryCount('3d') > 0 && (
-            <span className="count">{getCategoryCount('3d')}</span>
+          {getCategoryCount("3d") > 0 && (
+            <span className="count">{getCategoryCount("3d")}</span>
           )}
         </FilterButton>
         <FilterButton
-          active={activeFilter === 'mixte'}
-          onClick={() => setActiveFilter('mixte')}
+          active={activeFilter === "mixte"}
+          onClick={() => setActiveFilter("mixte")}
         >
           Projets Mixtes
-          {getCategoryCount('mixte') > 0 && (
-            <span className="count">{getCategoryCount('mixte')}</span>
+          {getCategoryCount("mixte") > 0 && (
+            <span className="count">{getCategoryCount("mixte")}</span>
           )}
         </FilterButton>
         <FilterButton
-          active={activeFilter === 'gravure'}
-          onClick={() => setActiveFilter('gravure')}
+          active={activeFilter === "gravure"}
+          onClick={() => setActiveFilter("gravure")}
         >
           Gravure
-          {getCategoryCount('gravure') > 0 && (
-            <span className="count">{getCategoryCount('gravure')}</span>
+          {getCategoryCount("gravure") > 0 && (
+            <span className="count">{getCategoryCount("gravure")}</span>
           )}
         </FilterButton>
       </FiltersSection>
@@ -581,7 +596,10 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
       {filteredCreations.length === 0 ? (
         <EmptyState>
           <h3>Aucune création trouvée</h3>
-          <p>Essayez de modifier vos critères de recherche ou contactez-nous pour un projet sur mesure.</p>
+          <p>
+            Essayez de modifier vos critères de recherche ou contactez-nous pour
+            un projet sur mesure.
+          </p>
         </EmptyState>
       ) : (
         <GalleryGrid>
@@ -596,17 +614,17 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
                       "https://via.placeholder.com/600x400?text=Image+indisponible";
                   }}
                 />
-                
+
                 {isAuthenticated && (
                   <div className="admin-actions">
-                    <button 
+                    <button
                       className="edit-btn"
                       onClick={() => handleEditCreation(creation)}
                       title="Modifier cette création"
                     >
                       <FaEdit />
                     </button>
-                    <button 
+                    <button
                       className="delete-btn"
                       onClick={() => handleDeleteCreation(creation)}
                       title="Supprimer cette création"
@@ -615,8 +633,8 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
                     </button>
                   </div>
                 )}
-                
-                <div 
+
+                <div
                   className="overlay"
                   onClick={() => openImageModal(creation, index)}
                 >
@@ -624,7 +642,9 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
                 </div>
               </div>
               <div className="content">
-                <span className="category">{getCategoryLabel(creation.category)}</span>
+                <span className="category">
+                  {getCategoryLabel(creation.category)}
+                </span>
                 <h3>{creation.title}</h3>
                 <p>{creation.description}</p>
                 {creation.price && formatPrice(creation.price) && (
@@ -642,33 +662,35 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
             <button className="close-btn" onClick={closeImageModal}>
               <FaTimes />
             </button>
-            
+
             <div className="image-container">
               <img
                 src={resolveImageUrl(selectedImage.image) || ""}
                 alt={selectedImage.title}
               />
-              
+
               {filteredCreations.length > 1 && (
                 <>
-                  <button 
-                    className="nav-btn prev" 
-                    onClick={() => navigateImage('prev')}
+                  <button
+                    className="nav-btn prev"
+                    onClick={() => navigateImage("prev")}
                   >
                     <FaChevronLeft />
                   </button>
-                  <button 
-                    className="nav-btn next" 
-                    onClick={() => navigateImage('next')}
+                  <button
+                    className="nav-btn next"
+                    onClick={() => navigateImage("next")}
                   >
                     <FaChevronRight />
                   </button>
                 </>
               )}
             </div>
-            
+
             <div className="image-info">
-              <span className="category">{getCategoryLabel(selectedImage.category)}</span>
+              <span className="category">
+                {getCategoryLabel(selectedImage.category)}
+              </span>
               <h3>{selectedImage.title}</h3>
               <p>{selectedImage.description}</p>
               {selectedImage.price && formatPrice(selectedImage.price) && (
