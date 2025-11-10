@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaClock, FaCheckCircle } from 'react-icons/fa';
-import emailjs from '@emailjs/browser';
+import emailjs from "@emailjs/browser";
+import React, { useState } from "react";
+import {
+  FaCheckCircle,
+  FaClock,
+  FaEnvelope,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
+import styled from "styled-components";
 
 const ContactContainer = styled.div`
   max-width: 1200px;
@@ -12,12 +17,12 @@ const ContactContainer = styled.div`
 const ContactHeader = styled.div`
   text-align: center;
   margin-bottom: 60px;
-  
+
   h1 {
     font-size: 2.5rem;
     margin-bottom: 20px;
   }
-  
+
   p {
     font-size: 1.2rem;
     color: #666;
@@ -31,7 +36,7 @@ const ContactContent = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 60px;
   margin-bottom: 80px;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     gap: 40px;
@@ -42,7 +47,7 @@ const ContactInfo = styled.div`
   h2 {
     font-size: 2rem;
     margin-bottom: 30px;
-    color: #8B4513;
+    color: #8b4513;
   }
 `;
 
@@ -55,11 +60,11 @@ const InfoItem = styled.div`
   background: white;
   border-radius: 15px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  
+
   .icon {
     width: 50px;
     height: 50px;
-    background: linear-gradient(135deg, #8B4513, #A0522D);
+    background: linear-gradient(135deg, #8b4513, #a0522d);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -67,14 +72,14 @@ const InfoItem = styled.div`
     color: white;
     font-size: 1.2rem;
   }
-  
+
   .content {
     h3 {
       font-size: 1.2rem;
       margin-bottom: 5px;
-      color: #8B4513;
+      color: #8b4513;
     }
-    
+
     p {
       color: #666;
       margin: 0;
@@ -87,42 +92,43 @@ const ContactForm = styled.form`
   padding: 40px;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  
+
   h2 {
     font-size: 2rem;
     margin-bottom: 30px;
-    color: #8B4513;
+    color: #8b4513;
   }
 `;
 
 const FormGroup = styled.div`
   margin-bottom: 25px;
-  
+
   label {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
     color: #333;
   }
-  
-  input, textarea {
+
+  input,
+  textarea {
     width: 100%;
     padding: 15px;
     border: 2px solid #e0e0e0;
     border-radius: 10px;
     font-size: 1rem;
     transition: border-color 0.3s ease;
-    
+
     &:focus {
-      border-color: #8B4513;
+      border-color: #8b4513;
       outline: none;
     }
-    
+
     &::placeholder {
       color: #999;
     }
   }
-  
+
   textarea {
     height: 120px;
     resize: vertical;
@@ -131,7 +137,7 @@ const FormGroup = styled.div`
 
 const SubmitButton = styled.button`
   width: 100%;
-  background: linear-gradient(135deg, #8B4513, #A0522D);
+  background: linear-gradient(135deg, #8b4513, #a0522d);
   color: white;
   padding: 15px;
   border-radius: 10px;
@@ -142,12 +148,12 @@ const SubmitButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: 10px;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 25px rgba(139, 69, 19, 0.3);
   }
-  
+
   &:disabled {
     opacity: 0.7;
     cursor: not-allowed;
@@ -164,7 +170,7 @@ const SuccessMessage = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
-  
+
   svg {
     font-size: 1.2rem;
   }
@@ -175,25 +181,25 @@ const MapSection = styled.div`
   padding: 60px 0;
   border-radius: 20px;
   text-align: center;
-  
+
   h2 {
     font-size: 2rem;
     margin-bottom: 20px;
-    color: #8B4513;
+    color: #8b4513;
   }
-  
+
   p {
     color: #666;
     margin-bottom: 30px;
   }
-  
+
   .map-container {
     width: 100%;
     height: 300px;
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    
+
     iframe {
       width: 100%;
       height: 100%;
@@ -204,11 +210,11 @@ const MapSection = styled.div`
 
 const Contact = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: ''
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -216,7 +222,7 @@ const Contact = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -225,8 +231,8 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      const serviceId = 'service_yppd38k';
-      const templateId = 'template_7v7sk5n';
+      const serviceId = "service_yppd38k";
+      const templateId = "template_7v7sk5n";
       const publicKey = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
 
       if (!publicKey) {
@@ -244,23 +250,23 @@ const Contact = () => {
           email: formData.email,
           phone: formData.phone,
           subject: formData.subject,
-          message: formData.message
+          message: formData.message,
         },
         {
-          publicKey
+          publicKey,
         }
       );
       setIsSubmitted(true);
       setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: ''
+        name: "",
+        email: "",
+        phone: "",
+        subject: "",
+        message: "",
       });
     } catch (error) {
-      console.error('Erreur lors de l\'envoi du message:', error);
-      alert('Une erreur est survenue. Veuillez réessayer.');
+      console.error("Erreur lors de l'envoi du message:", error);
+      alert("Une erreur est survenue. Veuillez réessayer.");
     } finally {
       setIsSubmitting(false);
     }
@@ -271,15 +277,15 @@ const Contact = () => {
       <ContactHeader>
         <h1>Contactez-nous</h1>
         <p>
-          Vous avez un projet en tête ? N'hésitez pas à nous contacter pour discuter 
-          de vos besoins et obtenir un devis personnalisé.
+          Vous avez un projet en tête ? N'hésitez pas à nous contacter pour
+          discuter de vos besoins et obtenir des conseils .
         </p>
       </ContactHeader>
 
       <ContactContent>
         <ContactInfo>
           <h2>Informations de contact</h2>
-          
+
           <InfoItem>
             <div className="icon">
               <FaMapMarkerAlt />
@@ -289,52 +295,39 @@ const Contact = () => {
               <p>Balgau (Alsace)</p>
             </div>
           </InfoItem>
-          
-          <InfoItem>
-            <div className="icon">
-              <FaPhone />
-            </div>
-            <div className="content">
-              <h3>Téléphone</h3>
-              <p>06 XX XX XX XX</p>
-            </div>
-          </InfoItem>
-          
+
           <InfoItem>
             <div className="icon">
               <FaEnvelope />
             </div>
             <div className="content">
               <h3>Email</h3>
-              <p>contact@atelier-patrick.fr</p>
+              <p>atelierdepatrick68@gmail.com</p>
             </div>
           </InfoItem>
-          
+
           <InfoItem>
             <div className="icon">
               <FaClock />
             </div>
             <div className="content">
               <h3>Horaires</h3>
-              <p>
-                Lundi - Vendredi: 9h - 18h<br />
-                Samedi: 9h - 12h<br />
-                Dimanche: Fermé
-              </p>
+              <p>Du lundi au vendredi : 9h - 18h</p>
             </div>
           </InfoItem>
         </ContactInfo>
 
         <ContactForm onSubmit={handleSubmit}>
           <h2>Envoyez-nous un message</h2>
-          
+
           {isSubmitted && (
             <SuccessMessage>
               <FaCheckCircle />
-              Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.
+              Votre message a été envoyé avec succès ! Nous vous répondrons dans
+              les plus brefs délais.
             </SuccessMessage>
           )}
-          
+
           <FormGroup>
             <label htmlFor="name">Nom complet *</label>
             <input
@@ -347,7 +340,7 @@ const Contact = () => {
               required
             />
           </FormGroup>
-          
+
           <FormGroup>
             <label htmlFor="email">Email *</label>
             <input
@@ -360,7 +353,7 @@ const Contact = () => {
               required
             />
           </FormGroup>
-          
+
           <FormGroup>
             <label htmlFor="phone">Téléphone</label>
             <input
@@ -372,7 +365,7 @@ const Contact = () => {
               placeholder="06 XX XX XX XX"
             />
           </FormGroup>
-          
+
           <FormGroup>
             <label htmlFor="subject">Sujet *</label>
             <input
@@ -385,7 +378,7 @@ const Contact = () => {
               required
             />
           </FormGroup>
-          
+
           <FormGroup>
             <label htmlFor="message">Message *</label>
             <textarea
@@ -397,9 +390,9 @@ const Contact = () => {
               required
             />
           </FormGroup>
-          
+
           <SubmitButton type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Envoi en cours...' : 'Envoyer le message'}
+            {isSubmitting ? "Envoi en cours..." : "Envoyer le message"}
           </SubmitButton>
         </ContactForm>
       </ContactContent>
@@ -412,7 +405,7 @@ const Contact = () => {
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d42773.372389584365!2d7.491705290908911!3d47.929888393538555!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47910cb26838ea6f%3A0xa6fd7edd1e0c4d43!2s68740%20Balgau!5e0!3m2!1sfr!2sfr!4v1760987316884!5m2!1sfr!2sfr"
             width="100%"
             height="300"
-            style={{ border: 0, borderRadius: '15px' }}
+            style={{ border: 0, borderRadius: "15px" }}
             allowFullScreen=""
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
