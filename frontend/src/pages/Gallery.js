@@ -552,11 +552,11 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
       <GalleryInner>
         <GalleryHeader>
           <h1>Galerie des Créations</h1>
-          <p>
+          {/* <p>
             Parcourez nos pièces uniques mêlant artisanat du bois et
             impression&nbsp;3D. Chaque réalisation est soigneusement conçue et
             photographiée dans l’atelier.
-          </p>
+          </p> */}
         </GalleryHeader>
 
         <Toolbar>
