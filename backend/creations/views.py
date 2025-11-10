@@ -56,13 +56,7 @@ class AdminCreationViewSet(viewsets.ModelViewSet):
 
     def _prepare_data(self, request, default_available=True):
         data = request.data.copy()
-        if 'is_available' not in data:
-            data['is_available'] = default_available
-        else:
-            data['is_available'] = self._normalize_boolean(
-                data.get('is_available'),
-                default=default_available
-            )
+        data['is_available'] = True
         return data
 
     def create(self, request, *args, **kwargs):
