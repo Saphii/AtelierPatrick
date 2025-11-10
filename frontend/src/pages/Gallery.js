@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaFilter, FaSearch, FaEye, FaTimes, FaChevronLeft, FaChevronRight, FaEdit, FaTrash } from 'react-icons/fa';
 import { useCreations } from '../contexts/CreationsContext';
+import { resolveImageUrl } from '../services/api';
 
 const GalleryContainer = styled.div`
   max-width: 1200px;
@@ -587,7 +588,14 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
           {filteredCreations.map((creation, index) => (
             <CreationCard key={creation.id}>
               <div className="image-container">
-                <img src={creation.image} alt={creation.title} />
+                <img
+                  src={resolveImageUrl(creation.image) || ""}
+                  alt={creation.title}
+                  onError={(e) => {
+                    e.target.src =
+                      "https://via.placeholder.com/600x400?text=Image+indisponible";
+                  }}
+                />
                 
                 {isAuthenticated && (
                   <div className="admin-actions">
@@ -636,7 +644,10 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
             </button>
             
             <div className="image-container">
-              <img src={selectedImage.image} alt={selectedImage.title} />
+              <img
+                src={resolveImageUrl(selectedImage.image) || ""}
+                alt={selectedImage.title}
+              />
               
               {filteredCreations.length > 1 && (
                 <>

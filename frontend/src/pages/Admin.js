@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 import styled from "styled-components";
 import CreationForm from "../components/CreationForm";
-import { authService, creationService } from "../services/api";
+import { authService, creationService, resolveImageUrl } from "../services/api";
 
 const AdminContainer = styled.div`
   min-height: 100vh;
@@ -462,7 +462,7 @@ const Admin = () => {
               <CreationCard key={creation.id}>
                 <div className="image-container">
                   <img
-                    src={creation.image}
+                    src={resolveImageUrl(creation.image) || ""}
                     alt={creation.title}
                     onError={(e) => {
                       e.target.src =

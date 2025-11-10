@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "/api";
+const MEDIA_BASE_URL = process.env.REACT_APP_MEDIA_BASE_URL || "";
 
 // Configuration d'axios avec le token d'authentification
 const api = axios.create({
@@ -132,6 +133,41 @@ export const creationService = {
     const response = await api.get("/admin/creations/");
     return response.data;
   },
+};
+
+const normalizeBase = (base) => {
+  if (!base) return "";
+  return base.endsWith("/") ? base.slice(0, -1) : base;
+};
+
+const buildMediaUrl = (relativePath) => {
+  const cleanRelative = relativePath.replace(/^\/+/, "");
+  const base = normalizeBase(MEDIA_BASE_URL);
+  if (!base) {
+    return `/media/${cleanRelative}`;
+  }
+  return `${base}/media/${cleanRelative}`;
+};
+
+export const resolveImageUrl = (url) => {
+  if (!url) return null;
+  const mediaMarker = "/media/";
+
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    const mediaIndex = url.indexOf(mediaMarker);
+    if (mediaIndex !== -1) {
+      const relative = url.substring(mediaIndex + mediaMarker.length);
+      return buildMediaUrl(relative);
+    }
+    return url;
+  }
+
+  if (url.startsWith(mediaMarker)) {
+    const relative = url.substring(mediaMarker.length);
+    return buildMediaUrl(relative);
+  }
+
+  return buildMediaUrl(url);
 };
 
 export default api;
