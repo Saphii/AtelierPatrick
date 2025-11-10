@@ -7,9 +7,52 @@ const HomeContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  position: relative;
+`;
+
+const Flourish = styled.div`
+  position: absolute;
+  top: 50%;
+  width: 220px;
+  height: 220px;
+  margin-top: -110px;
+  pointer-events: none;
+  opacity: 0.65;
+  filter: drop-shadow(0 12px 25px rgba(0, 0, 0, 0.25));
+
+  @media (max-width: 1100px) {
+    display: none;
+  }
+`;
+
+const PrintFlourish = styled(Flourish)`
+  left: -80px;
+  background: url('/images/hero-print.svg') center/contain no-repeat;
+  animation: plotter 6s ease-in-out infinite;
+
+  @keyframes plotter {
+    0%, 100% { transform: translateY(0) rotate(-4deg); }
+    50% { transform: translateY(-14px) rotate(0deg); }
+  }
+`;
+
+const LaserFlourish = styled(Flourish)`
+  right: -80px;
+  background: url('/images/hero-laser.svg') center/contain no-repeat;
+  animation: laser 5.5s ease-in-out infinite;
+
+  @keyframes laser {
+    0%, 100% { transform: translateY(0) rotate(5deg); opacity: 0.55; }
+    40% { transform: translateY(-10px) rotate(0deg); opacity: 0.95; }
+    70% { transform: translateY(-6px) rotate(2deg); opacity: 0.75; }
+  }
 `;
 
 const HeroSection = styled.section`
+  position: relative;
+  min-height: calc(100vh - 100px);
+  display: flex;
+  align-items: center;
   background: linear-gradient(135deg, rgba(139, 69, 19, 0.95), rgba(160, 82, 45, 0.95)), 
               url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="wood" patternUnits="userSpaceOnUse" width="20" height="20"><rect width="20" height="20" fill="%23f4f1ed"/><path d="M0 10h20M10 0v20" stroke="%23d4c4b0" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23wood)"/></svg>');
   background-size: cover;
@@ -17,9 +60,8 @@ const HeroSection = styled.section`
   color: white;
   text-align: center;
   padding: 120px 0;
-  margin: 40px 20px 100px 20px;
+  margin: 40px 20px 80px 20px;
   border-radius: 30px;
-  position: relative;
   overflow: hidden;
   
   &::before {
@@ -406,6 +448,8 @@ const TestimonialCard = styled.div`
 const Home = () => {
   return (
     <HomeContainer>
+      <PrintFlourish aria-hidden="true" />
+      <LaserFlourish aria-hidden="true" />
       <HeroSection>
         <div className="hero-content">
           <div className="logo-section">
