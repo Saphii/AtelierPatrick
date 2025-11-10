@@ -14,99 +14,121 @@ import { useCreations } from "../contexts/CreationsContext";
 import { resolveImageUrl } from "../services/api";
 
 const GalleryContainer = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+  background: linear-gradient(180deg, #f7f3ef 0%, #ffffff 100%);
+  padding: 80px 0 120px;
 `;
 
-const GalleryHeader = styled.div`
+const GalleryInner = styled.div`
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px;
+`;
+
+const GalleryHeader = styled.header`
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 56px;
 
   h1 {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
+    font-size: 2.75rem;
+    margin-bottom: 12px;
+    color: #4a2f18;
+    letter-spacing: -0.02em;
   }
 
   p {
-    font-size: 1.2rem;
-    color: #666;
-    max-width: 600px;
+    font-size: 1.15rem;
+    color: #5b5147;
+    max-width: 620px;
     margin: 0 auto;
+    line-height: 1.7;
+  }
+`;
+
+const Toolbar = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 48px;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
   }
 `;
 
 const FiltersSection = styled.div`
   display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 40px;
   flex-wrap: wrap;
+  gap: 12px;
 `;
 
 const FilterButton = styled.button`
-  padding: 12px 24px;
-  border-radius: 25px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid ${(props) => (props.active ? "#8B4513" : "#e0d5cb")};
   background: ${(props) => (props.active ? "#8B4513" : "white")};
-  color: ${(props) => (props.active ? "white" : "#8B4513")};
-  border: 2px solid #8b4513;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  position: relative;
+  color: ${(props) => (props.active ? "white" : "#5b5147")};
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 
   &:hover {
-    background: #8b4513;
-    color: white;
+    border-color: #8b4513;
+    color: ${(props) => (props.active ? "white" : "#8B4513")};
     transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(139, 69, 19, 0.12);
   }
 
   .count {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #a0522d;
-    color: white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 0.7rem;
-    display: flex;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: ${(props) =>
+      props.active ? "rgba(255,255,255,0.25)" : "#efe5dd"};
+    color: ${(props) => (props.active ? "white" : "#8B4513")};
+    font-size: 0.75rem;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
   }
 `;
 
 const SearchBar = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-bottom: 40px;
+  flex: 1;
 
   .search-input {
     display: flex;
     align-items: center;
     background: white;
-    border-radius: 25px;
+    border-radius: 18px;
     padding: 0 20px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
+    border: 1px solid #e6ded6;
+    box-shadow: 0 8px 18px rgba(90, 72, 54, 0.08);
+    transition: border 0.2s ease;
+
+    &:focus-within {
+      border-color: #b17a4b;
+    }
 
     input {
       flex: 1;
-      padding: 15px 10px;
+      padding: 14px 12px;
       border: none;
       background: transparent;
       font-size: 1rem;
+      color: #3f2c1d;
 
       &::placeholder {
-        color: #999;
+        color: #9c8d82;
       }
     }
 
     svg {
-      color: #8b4513;
+      color: #b17a4b;
       font-size: 1.2rem;
     }
   }
@@ -114,158 +136,191 @@ const SearchBar = styled.div`
 
 const GalleryGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 30px;
-  margin-bottom: 60px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 28px;
 `;
 
-const CreationCard = styled.div`
+const CreationCard = styled.article`
   background: white;
   border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(57, 38, 23, 0.12);
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
 
   &:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 38px rgba(57, 38, 23, 0.18);
   }
+`;
 
-  .image-container {
-    position: relative;
-    height: 250px;
-    overflow: hidden;
+const CardImageWrapper = styled.div`
+  position: relative;
+  padding-top: 68%;
+  overflow: hidden;
 
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.3s ease;
-    }
-
-    &:hover img {
-      transform: scale(1.05);
-    }
-
-    .overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(139, 69, 19, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: 5;
-
-      svg {
-        color: white;
-        font-size: 2rem;
-      }
-    }
-
-    &:hover .overlay {
-      opacity: 1;
-    }
-  }
-
-  .content {
-    padding: 25px;
-
-    .category {
-      display: inline-block;
-      background: #f0f0f0;
-      color: #8b4513;
-      padding: 5px 12px;
-      border-radius: 15px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      margin-bottom: 15px;
-    }
-
-    h3 {
-      font-size: 1.3rem;
-      margin-bottom: 10px;
-    }
-
-    p {
-      color: #666;
-      line-height: 1.6;
-      margin-bottom: 15px;
-    }
-
-    .price {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #8b4513;
-    }
-  }
-
-  .admin-actions {
+  img {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    gap: 8px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 10;
-
-    button {
-      background: rgba(0, 0, 0, 0.7);
-      border: none;
-      color: white;
-      padding: 8px;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      &:hover {
-        background: rgba(0, 0, 0, 0.9);
-        transform: scale(1.1);
-      }
-
-      &.edit-btn {
-        background: rgba(33, 150, 243, 0.8);
-
-        &:hover {
-          background: rgba(33, 150, 243, 1);
-        }
-      }
-
-      &.delete-btn {
-        background: rgba(244, 67, 54, 0.8);
-
-        &:hover {
-          background: rgba(244, 67, 54, 1);
-        }
-      }
-    }
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s ease;
   }
 
-  &:hover .admin-actions {
+  ${CreationCard}:hover & img {
+    transform: scale(1.06);
+  }
+`;
+
+const ImageOverlay = styled.button`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    180deg,
+    rgba(19, 12, 7, 0) 20%,
+    rgba(19, 12, 7, 0.65) 100%
+  );
+  color: white;
+  font-size: 1.6rem;
+  border: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  cursor: pointer;
+
+  ${CreationCard}:hover & {
     opacity: 1;
   }
 `;
 
+const AdminActions = styled.div`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+
+  button {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(22, 14, 5, 0.65);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, background 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      background: rgba(22, 14, 5, 0.85);
+    }
+
+    &.edit-btn {
+      background: rgba(33, 150, 243, 0.85);
+      &:hover {
+        background: rgba(33, 150, 243, 1);
+      }
+    }
+
+    &.delete-btn {
+      background: rgba(220, 53, 69, 0.85);
+      &:hover {
+        background: rgba(220, 53, 69, 1);
+      }
+    }
+  }
+
+  ${CreationCard}:hover & {
+    opacity: 1;
+  }
+`;
+
+const CategoryBadge = styled.span`
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #5b3c24;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+`;
+
+const CardContent = styled.div`
+  padding: 22px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+`;
+
+const CardTitle = styled.h3`
+  font-size: 1.15rem;
+  color: #3b2716;
+  margin: 0;
+`;
+
+const CardDescription = styled.p`
+  color: #7a6a5f;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  flex: 1;
+`;
+
+const CardFooter = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+`;
+
+const PriceTag = styled.span`
+  background: rgba(139, 69, 19, 0.1);
+  color: #8b4513;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+`;
+
+const StatusBadge = styled.span`
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: ${(props) => (props.available ? "#d7f4df" : "#ffe1e1")};
+  color: ${(props) => (props.available ? "#1f7a3f" : "#a43030")};
+`;
+
 const EmptyState = styled.div`
   text-align: center;
-  padding: 80px 20px;
-  color: #666;
+  padding: 100px 20px;
+  color: #7a6a5f;
 
   h3 {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
+    font-size: 1.6rem;
+    margin-bottom: 14px;
+    color: #4a2f18;
   }
 
   p {
-    font-size: 1.1rem;
+    font-size: 1rem;
+    max-width: 440px;
+    margin: 0 auto;
+    line-height: 1.6;
   }
 `;
 
@@ -525,181 +580,197 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
 
   return (
     <GalleryContainer>
-      <GalleryHeader>
-        <h1>Galerie des Créations</h1>
-        {/* <p>
-          Découvrez notre collection de créations uniques en bois et impressions 3D. 
-          Chaque pièce raconte une histoire et témoigne de notre passion pour l'artisanat.
-        </p> */}
-      </GalleryHeader>
-
-      <FiltersSection>
-        <FilterButton
-          active={activeFilter === "all"}
-          onClick={() => setActiveFilter("all")}
-        >
-          <FaFilter /> Toutes
-          {creations.length > 0 && (
-            <span className="count">{creations.length}</span>
-          )}
-        </FilterButton>
-        <FilterButton
-          active={activeFilter === "bois"}
-          onClick={() => setActiveFilter("bois")}
-        >
-          Créations Bois
-          {getCategoryCount("bois") > 0 && (
-            <span className="count">{getCategoryCount("bois")}</span>
-          )}
-        </FilterButton>
-        <FilterButton
-          active={activeFilter === "3d"}
-          onClick={() => setActiveFilter("3d")}
-        >
-          Impressions 3D
-          {getCategoryCount("3d") > 0 && (
-            <span className="count">{getCategoryCount("3d")}</span>
-          )}
-        </FilterButton>
-        <FilterButton
-          active={activeFilter === "mixte"}
-          onClick={() => setActiveFilter("mixte")}
-        >
-          Projets Mixtes
-          {getCategoryCount("mixte") > 0 && (
-            <span className="count">{getCategoryCount("mixte")}</span>
-          )}
-        </FilterButton>
-        <FilterButton
-          active={activeFilter === "gravure"}
-          onClick={() => setActiveFilter("gravure")}
-        >
-          Gravure
-          {getCategoryCount("gravure") > 0 && (
-            <span className="count">{getCategoryCount("gravure")}</span>
-          )}
-        </FilterButton>
-      </FiltersSection>
-
-      <SearchBar>
-        <div className="search-input">
-          <FaSearch />
-          <input
-            type="text"
-            placeholder="Rechercher une création..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </SearchBar>
-
-      {filteredCreations.length === 0 ? (
-        <EmptyState>
-          <h3>Aucune création trouvée</h3>
+      <GalleryInner>
+        <GalleryHeader>
+          <h1>Galerie des Créations</h1>
           <p>
-            Essayez de modifier vos critères de recherche ou contactez-nous pour
-            un projet sur mesure.
+            Parcourez nos pièces uniques mêlant artisanat du bois et
+            impression&nbsp;3D. Chaque réalisation est soigneusement conçue et
+            photographiée dans l’atelier.
           </p>
-        </EmptyState>
-      ) : (
-        <GalleryGrid>
-          {filteredCreations.map((creation, index) => (
-            <CreationCard key={creation.id}>
+        </GalleryHeader>
+
+        <Toolbar>
+          <FiltersSection>
+            <FilterButton
+              active={activeFilter === "all"}
+              onClick={() => setActiveFilter("all")}
+            >
+              <FaFilter /> Toutes
+              {creations.length > 0 && (
+                <span className="count">{creations.length}</span>
+              )}
+            </FilterButton>
+            <FilterButton
+              active={activeFilter === "bois"}
+              onClick={() => setActiveFilter("bois")}
+            >
+              Créations Bois
+              {getCategoryCount("bois") > 0 && (
+                <span className="count">{getCategoryCount("bois")}</span>
+              )}
+            </FilterButton>
+            <FilterButton
+              active={activeFilter === "3d"}
+              onClick={() => setActiveFilter("3d")}
+            >
+              Impressions 3D
+              {getCategoryCount("3d") > 0 && (
+                <span className="count">{getCategoryCount("3d")}</span>
+              )}
+            </FilterButton>
+            <FilterButton
+              active={activeFilter === "mixte"}
+              onClick={() => setActiveFilter("mixte")}
+            >
+              Projets Mixtes
+              {getCategoryCount("mixte") > 0 && (
+                <span className="count">{getCategoryCount("mixte")}</span>
+              )}
+            </FilterButton>
+            <FilterButton
+              active={activeFilter === "gravure"}
+              onClick={() => setActiveFilter("gravure")}
+            >
+              Gravure
+              {getCategoryCount("gravure") > 0 && (
+                <span className="count">{getCategoryCount("gravure")}</span>
+              )}
+            </FilterButton>
+          </FiltersSection>
+
+          <SearchBar>
+            <div className="search-input">
+              <FaSearch />
+              <input
+                type="text"
+                placeholder="Rechercher une création..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </SearchBar>
+        </Toolbar>
+
+        {filteredCreations.length === 0 ? (
+          <EmptyState>
+            <h3>Aucune création trouvée</h3>
+            <p>
+              Essayez de modifier vos critères de recherche ou contactez-nous
+              pour un projet sur mesure.
+            </p>
+          </EmptyState>
+        ) : (
+          <GalleryGrid>
+            {filteredCreations.map((creation, index) => (
+              <CreationCard key={creation.id}>
+                <CardImageWrapper>
+                  <img
+                    src={resolveImageUrl(creation.image) || ""}
+                    alt={creation.title}
+                    onError={(e) => {
+                      e.target.src =
+                        "https://via.placeholder.com/600x400?text=Image+indisponible";
+                    }}
+                  />
+                  <CategoryBadge>
+                    {getCategoryLabel(creation.category)}
+                  </CategoryBadge>
+
+                  {isAuthenticated && (
+                    <AdminActions>
+                      <button
+                        className="edit-btn"
+                        onClick={() => handleEditCreation(creation)}
+                        title="Modifier cette création"
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDeleteCreation(creation)}
+                        title="Supprimer cette création"
+                      >
+                        <FaTrash />
+                      </button>
+                    </AdminActions>
+                  )}
+
+                  <ImageOverlay
+                    type="button"
+                    onClick={() => openImageModal(creation, index)}
+                    aria-label={`Voir ${creation.title} en grand`}
+                  >
+                    <FaEye />
+                  </ImageOverlay>
+                </CardImageWrapper>
+
+                <CardContent>
+                  <CardTitle>{creation.title}</CardTitle>
+                  <CardDescription>{creation.description}</CardDescription>
+                  <CardFooter>
+                    {creation.price && formatPrice(creation.price) ? (
+                      <PriceTag>{formatPrice(creation.price)}€</PriceTag>
+                    ) : (
+                      <PriceTag>Sur devis</PriceTag>
+                    )}
+                    <StatusBadge available={creation.is_available}>
+                      {creation.is_available ? "Disponible" : "Non disponible"}
+                    </StatusBadge>
+                  </CardFooter>
+                </CardContent>
+              </CreationCard>
+            ))}
+          </GalleryGrid>
+        )}
+
+        {selectedImage && (
+          <ImageModal onClick={closeImageModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <button className="close-btn" onClick={closeImageModal}>
+                <FaTimes />
+              </button>
+
               <div className="image-container">
                 <img
-                  src={resolveImageUrl(creation.image) || ""}
-                  alt={creation.title}
-                  onError={(e) => {
-                    e.target.src =
-                      "https://via.placeholder.com/600x400?text=Image+indisponible";
-                  }}
+                  src={resolveImageUrl(selectedImage.image) || ""}
+                  alt={selectedImage.title}
                 />
 
-                {isAuthenticated && (
-                  <div className="admin-actions">
+                {filteredCreations.length > 1 && (
+                  <>
                     <button
-                      className="edit-btn"
-                      onClick={() => handleEditCreation(creation)}
-                      title="Modifier cette création"
+                      className="nav-btn prev"
+                      onClick={() => navigateImage("prev")}
                     >
-                      <FaEdit />
+                      <FaChevronLeft />
                     </button>
                     <button
-                      className="delete-btn"
-                      onClick={() => handleDeleteCreation(creation)}
-                      title="Supprimer cette création"
+                      className="nav-btn next"
+                      onClick={() => navigateImage("next")}
                     >
-                      <FaTrash />
+                      <FaChevronRight />
                     </button>
+                  </>
+                )}
+              </div>
+
+              <div className="image-info">
+                <span className="category">
+                  {getCategoryLabel(selectedImage.category)}
+                </span>
+                <h3>{selectedImage.title}</h3>
+                <p>{selectedImage.description}</p>
+                {selectedImage.price && formatPrice(selectedImage.price) && (
+                  <div className="price">
+                    {formatPrice(selectedImage.price)}€
                   </div>
                 )}
-
-                <div
-                  className="overlay"
-                  onClick={() => openImageModal(creation, index)}
-                >
-                  <FaEye />
-                </div>
               </div>
-              <div className="content">
-                <span className="category">
-                  {getCategoryLabel(creation.category)}
-                </span>
-                <h3>{creation.title}</h3>
-                <p>{creation.description}</p>
-                {creation.price && formatPrice(creation.price) && (
-                  <div className="price">{formatPrice(creation.price)}€</div>
-                )}
-              </div>
-            </CreationCard>
-          ))}
-        </GalleryGrid>
-      )}
-
-      {selectedImage && (
-        <ImageModal onClick={closeImageModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-btn" onClick={closeImageModal}>
-              <FaTimes />
-            </button>
-
-            <div className="image-container">
-              <img
-                src={resolveImageUrl(selectedImage.image) || ""}
-                alt={selectedImage.title}
-              />
-
-              {filteredCreations.length > 1 && (
-                <>
-                  <button
-                    className="nav-btn prev"
-                    onClick={() => navigateImage("prev")}
-                  >
-                    <FaChevronLeft />
-                  </button>
-                  <button
-                    className="nav-btn next"
-                    onClick={() => navigateImage("next")}
-                  >
-                    <FaChevronRight />
-                  </button>
-                </>
-              )}
             </div>
-
-            <div className="image-info">
-              <span className="category">
-                {getCategoryLabel(selectedImage.category)}
-              </span>
-              <h3>{selectedImage.title}</h3>
-              <p>{selectedImage.description}</p>
-              {selectedImage.price && formatPrice(selectedImage.price) && (
-                <div className="price">{formatPrice(selectedImage.price)}€</div>
-              )}
-            </div>
-          </div>
-        </ImageModal>
-      )}
+          </ImageModal>
+        )}
+      </GalleryInner>
     </GalleryContainer>
   );
 };
