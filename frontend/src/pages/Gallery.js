@@ -525,13 +525,13 @@ const Gallery = ({ isAuthenticated, onEditCreation, onDeleteCreation }) => {
 
   return (
     <GalleryContainer>
-      {/* <GalleryHeader>
+      <GalleryHeader>
         <h1>Galerie des Créations</h1>
-        <p>
+        {/* <p>
           Découvrez notre collection de créations uniques en bois et impressions 3D. 
           Chaque pièce raconte une histoire et témoigne de notre passion pour l'artisanat.
-        </p>
-      </GalleryHeader> */}
+        </p> */}
+      </GalleryHeader>
 
       <FiltersSection>
         <FilterButton
