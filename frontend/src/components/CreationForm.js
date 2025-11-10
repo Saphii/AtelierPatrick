@@ -292,16 +292,29 @@ const CreationForm = ({ creation, onClose, onSubmit }) => {
     setError('');
 
     try {
+      let result;
       if (creation) {
-        await creationService.update(creation.id, formData);
+        result = await creationService.update(creation.id, formData);
       } else {
-        await creationService.create(formData);
+        result = await creationService.create(formData);
       }
-      
+
+      const message =
+        result?.message ||
+        (creation
+          ? 'Création mise à jour avec succès !'
+          : 'Création créée avec succès !');
+
+      const returnedCreation = result?.creation || null;
+
       // Forcer le rafraîchissement du contexte
       window.dispatchEvent(new CustomEvent('refreshCreations'));
-      
-      onSubmit();
+
+      onSubmit({
+        message,
+        creation: returnedCreation,
+        mode: creation ? 'update' : 'create',
+      });
     } catch (error) {
       setError(error.message || 'Erreur lors de la sauvegarde');
     } finally {

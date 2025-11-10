@@ -45,9 +45,12 @@ class AdminCreationViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            creation = serializer.save()
             return Response(
-                {'message': 'Création ajoutée avec succès !'},
+                {
+                    'message': 'Création ajoutée avec succès !',
+                    'creation': self.get_serializer(creation).data
+                },
                 status=status.HTTP_201_CREATED
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -57,9 +60,12 @@ class AdminCreationViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if serializer.is_valid():
-            serializer.save()
+            creation = serializer.save()
             return Response(
-                {'message': 'Création mise à jour avec succès !'},
+                {
+                    'message': 'Création mise à jour avec succès !',
+                    'creation': self.get_serializer(creation).data
+                },
                 status=status.HTTP_200_OK
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

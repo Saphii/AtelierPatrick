@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  FaCheckCircle,
   FaEdit,
   FaImages,
   FaPlus,
@@ -259,16 +260,72 @@ const EmptyState = styled.div`
   }
 `;
 
+const SuccessToast = styled.div`
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  background: linear-gradient(135deg, #28a745, #218838);
+  color: white;
+  padding: 20px 25px;
+  border-radius: 15px;
+  box-shadow: 0 15px 35px rgba(33, 136, 56, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  z-index: 2000;
+  animation: fadeInUp 0.3s ease-out forwards;
+
+  .icon {
+    font-size: 1.8rem;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    strong {
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+    }
+
+    span {
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
 const Admin = () => {
   const [creations, setCreations] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingCreation, setEditingCreation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const toastTimeout = useRef(null);
 
   useEffect(() => {
     loadUser();
     loadCreations();
+
+    return () => {
+      if (toastTimeout.current) {
+        clearTimeout(toastTimeout.current);
+      }
+    };
   }, []);
 
   const loadUser = () => {
@@ -320,9 +377,22 @@ const Admin = () => {
     }
   };
 
-  const handleFormSubmit = async () => {
+  const handleFormSubmit = async (payload) => {
     setShowForm(false);
     setEditingCreation(null);
+    if (toastTimeout.current) {
+      clearTimeout(toastTimeout.current);
+    }
+    const message =
+      payload?.message ||
+      (payload?.mode === "update"
+        ? "Création mise à jour avec succès !"
+        : "Création créée avec succès !");
+    setToastMessage(message);
+    setShowToast(true);
+    toastTimeout.current = setTimeout(() => {
+      setShowToast(false);
+    }, 4000);
     await loadCreations();
   };
 
@@ -450,6 +520,17 @@ const Admin = () => {
           }}
           onSubmit={handleFormSubmit}
         />
+      )}
+      {showToast && (
+        <SuccessToast>
+          <div className="icon">
+            <FaCheckCircle />
+          </div>
+          <div className="content">
+            <strong>Succès</strong>
+            <span>{toastMessage}</span>
+          </div>
+        </SuccessToast>
       )}
     </AdminContainer>
   );
