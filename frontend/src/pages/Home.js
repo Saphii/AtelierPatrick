@@ -10,11 +10,24 @@ const HomeContainer = styled.div`
   position: relative;
   overflow-x: hidden;
   z-index: 1;
+  min-height: 100vh;
   
   /* Permet le scroll vertical mais cache le débordement horizontal */
   @media (max-width: 768px) {
     padding: 0 15px;
   }
+`;
+
+// Container pour les billes (position absolute par rapport à la page)
+const MarblesContainer = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  min-height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
 `;
 
 // Animations pour les éléments décoratifs
@@ -89,7 +102,7 @@ const fadeInOut = keyframes`
 
 // Billes décoratives en fond d'écran (statiques, avec fade in/out)
 const DecorativeMarble = styled.div`
-  position: fixed;
+  position: absolute;
   width: ${props => props.size || '60px'};
   height: ${props => props.size || '60px'};
   border-radius: 50%;
@@ -108,6 +121,7 @@ const DecorativeMarble = styled.div`
   animation: ${fadeInOut} ${props => props.duration || '8s'} ease-in-out infinite;
   animation-delay: ${props => props.delay || '0s'};
   backdrop-filter: blur(2px);
+  will-change: opacity, transform; /* Optimisation pour les animations */
   
   /* Limiter la zone pour éviter header (80px) et footer (environ 200px) */
   /* Les positions top/bottom sont gérées via les props */
@@ -743,7 +757,9 @@ const Home = () => {
       
       const isPositionValid = (x, y, size) => {
         // Vérifier qu'on reste dans les limites de l'écran
-        if (x < 20 || x + size > viewportWidth - 20 || y < 100 || y + size > totalHeight - 250) {
+        // Ne pas dépasser le footer (environ 250px du bas)
+        const footerTop = totalHeight - 250;
+        if (x < 20 || x + size > viewportWidth - 20 || y < 100 || y > footerTop - size) {
           return false;
         }
         
@@ -794,7 +810,9 @@ const Home = () => {
         
         // Positions vraiment aléatoires sur toute la hauteur disponible
         const x = 20 + Math.random() * (viewportWidth - size - 40);
-        const y = 100 + Math.random() * (totalHeight - 350 - size); // Permettre sur toute la hauteur
+        const footerTop = totalHeight - 250;
+        const maxY = footerTop - size - 20; // S'assurer qu'on ne touche pas le footer
+        const y = 100 + Math.random() * Math.max(0, maxY - 100); // Permettre sur toute la hauteur sauf footer
         
         if (isPositionValid(x, y, size)) {
           // Utiliser le type du pool pour une répartition équilibrée
@@ -828,21 +846,21 @@ const Home = () => {
       generateMarbles();
     }, 100);
     
-    // Régénérer au redimensionnement de la fenêtre
+    // Régénérer uniquement au redimensionnement de la fenêtre (pas au scroll)
+    let resizeTimer;
     const handleResize = () => {
-      clearTimeout(timer);
-      setTimeout(() => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
         generateMarbles();
-      }, 200);
+      }, 300);
     };
     
     window.addEventListener('resize', handleResize);
-    window.addEventListener('scroll', handleResize);
     
     return () => {
       clearTimeout(timer);
+      clearTimeout(resizeTimer);
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('scroll', handleResize);
     };
   }, []);
 
@@ -900,21 +918,25 @@ const Home = () => {
   };
 
   return (
-    <HomeContainer>
-      {/* Billes décoratives générées aléatoirement */}
-      {marbles.map((marble) => (
-        <DecorativeMarble
-          key={marble.id}
-          left={marble.left}
-          top={marble.top}
-          size={marble.size}
-          delay={marble.delay}
-          duration={marble.duration}
-          gradient={marble.gradient}
-        >
-          {renderMarbleContent(marble.type)}
-        </DecorativeMarble>
-      ))}
+    <>
+      {/* Container pour les billes (en dehors du HomeContainer pour couvrir toute la page) */}
+      <MarblesContainer>
+        {marbles.map((marble) => (
+          <DecorativeMarble
+            key={marble.id}
+            left={marble.left}
+            top={marble.top}
+            size={marble.size}
+            delay={marble.delay}
+            duration={marble.duration}
+            gradient={marble.gradient}
+          >
+            {renderMarbleContent(marble.type)}
+          </DecorativeMarble>
+        ))}
+      </MarblesContainer>
+      
+      <HomeContainer>
 
       <HeroSection>
         <div className="hero-content">
@@ -991,7 +1013,8 @@ const Home = () => {
           </ServiceCard>
         </ServicesGrid>
       </ServicesSection>
-    </HomeContainer>
+      </HomeContainer>
+    </>
   );
 };
 
