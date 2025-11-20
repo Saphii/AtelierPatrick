@@ -162,6 +162,7 @@ const VideoContainer = styled.div`
       : 'right: -360px;'}
     width: 320px;
     height: 420px;
+    margin-top: -210px; /* Moitié de 420px */
   }
   
   @media (max-width: 1400px) {
@@ -170,6 +171,7 @@ const VideoContainer = styled.div`
       : 'right: -320px;'}
     width: 280px;
     height: 380px;
+    margin-top: -190px; /* Moitié de 380px */
   }
   
   @media (max-width: 1200px) {
@@ -178,12 +180,14 @@ const VideoContainer = styled.div`
       : 'right: -280px;'}
     width: 250px;
     height: 350px;
+    margin-top: -175px; /* Moitié de 350px */
   }
   
   @media (max-width: 1024px) {
     /* Tablette : vidéos plus petites et mieux positionnées */
     width: 200px;
     height: 280px;
+    margin-top: -140px; /* Moitié de 280px */
     ${props => props.side === 'left' 
       ? 'left: -230px;' 
       : 'right: -230px;'}
