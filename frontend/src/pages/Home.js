@@ -61,41 +61,41 @@ const fadeInUp = keyframes`
   }
 `;
 
-// Éléments décoratifs flottants sur les côtés
-const SideDecoration = styled.div`
+// Animation de rebond pour les boules
+const bounce = keyframes`
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(-30px) scale(1.1);
+  }
+  50% {
+    transform: translateY(-60px) scale(0.9);
+  }
+  75% {
+    transform: translateY(-30px) scale(1.05);
+  }
+`;
+
+// Petites boules brunes qui rebondissent
+const BouncingBall = styled.div`
   position: fixed;
-  width: ${props => props.size || '200px'};
-  height: ${props => props.size || '200px'};
+  width: ${props => props.size || '60px'};
+  height: ${props => props.size || '60px'};
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b4513, #a0522d);
+  box-shadow: 0 4px 15px rgba(139, 69, 19, 0.4);
   pointer-events: none;
   z-index: 0;
-  opacity: 0.15;
-  ${props => props.left ? 'left: -100px;' : 'right: -100px;'}
+  opacity: 0.6;
+  ${props => props.left ? 'left: 20px;' : 'right: 20px;'}
   top: ${props => props.top || '20%'};
-  animation: ${float} ${props => props.duration || '8s'} ease-in-out infinite;
+  animation: ${bounce} ${props => props.duration || '2s'} ease-in-out infinite;
   animation-delay: ${props => props.delay || '0s'};
   
   @media (max-width: 1200px) {
     display: none;
   }
-`;
-
-const DecorativeCircle = styled(SideDecoration)`
-  border-radius: 50%;
-  background: linear-gradient(135deg, #8b4513, #a0522d);
-  filter: blur(40px);
-  animation: ${pulse} 4s ease-in-out infinite;
-`;
-
-const DecorativeShape = styled(SideDecoration)`
-  background: linear-gradient(45deg, rgba(139, 69, 19, 0.3), rgba(160, 82, 45, 0.3));
-  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-  animation: ${floatReverse} 10s ease-in-out infinite;
-`;
-
-const DecorativeRing = styled(SideDecoration)`
-  border: 3px solid rgba(139, 69, 19, 0.2);
-  border-radius: 50%;
-  animation: ${rotate} 20s linear infinite;
 `;
 
 const Flourish = styled.div`
@@ -170,7 +170,7 @@ const HeroSection = styled.section`
   margin: 40px 20px 80px 20px;
   border-radius: 30px;
   overflow: hidden;
-  z-index: 1;
+  z-index: 2;
 
   &::before {
     content: "";
@@ -710,14 +710,16 @@ const Home = () => {
 
   return (
     <HomeContainer>
-      {/* Éléments décoratifs flottants sur les côtés */}
-      <DecorativeCircle left top="10%" size="250px" delay="0s" />
-      <DecorativeShape left top="40%" size="180px" delay="2s" />
-      <DecorativeRing left top="70%" size="150px" delay="4s" />
+      {/* Petites boules brunes qui rebondissent sur les côtés */}
+      <BouncingBall left top="15%" size="50px" delay="0s" duration="2s" />
+      <BouncingBall left top="35%" size="40px" delay="0.4s" duration="2.2s" />
+      <BouncingBall left top="55%" size="45px" delay="0.8s" duration="2.4s" />
+      <BouncingBall left top="75%" size="35px" delay="1.2s" duration="2.1s" />
       
-      <DecorativeCircle top="20%" size="220px" delay="1s" />
-      <DecorativeShape top="50%" size="200px" delay="3s" />
-      <DecorativeRing top="80%" size="170px" delay="5s" />
+      <BouncingBall top="20%" size="55px" delay="0.2s" duration="2.3s" />
+      <BouncingBall top="40%" size="42px" delay="0.6s" duration="2.5s" />
+      <BouncingBall top="60%" size="48px" delay="1s" duration="2.2s" />
+      <BouncingBall top="80%" size="38px" delay="1.4s" duration="2.4s" />
 
       <PrintFlourish aria-hidden="true" />
       <LaserFlourish aria-hidden="true" />
