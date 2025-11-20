@@ -17,10 +17,14 @@ const getApiBaseUrl = () => {
   const protocol = window.location.protocol;
   const hostname = window.location.hostname;
   
-  // Si le frontend est sur Netlify ou un autre domaine, utiliser l'IP du serveur
-  // Utiliser HTTPS si disponible, sinon HTTP
-  if (hostname.includes('netlify.app') || hostname.includes('vercel.app') || hostname !== '217.154.172.35') {
-    // Essayer HTTPS d'abord, puis HTTP en fallback
+  // Si le frontend est sur Netlify, utiliser l'URL relative (Netlify proxy)
+  // Netlify redirige /api/* vers le backend via netlify.toml
+  if (hostname.includes('netlify.app') || hostname.includes('vercel.app')) {
+    return '/api';
+  }
+  
+  // Si on accède directement via l'IP, utiliser HTTP
+  if (hostname === '217.154.172.35') {
     return 'http://217.154.172.35/api';
   }
   
@@ -38,7 +42,14 @@ const getMediaBaseUrl = () => {
   }
   
   const hostname = window.location.hostname;
-  if (hostname.includes('netlify.app') || hostname.includes('vercel.app') || hostname !== '217.154.172.35') {
+  
+  // Si le frontend est sur Netlify, utiliser l'URL relative (Netlify proxy)
+  if (hostname.includes('netlify.app') || hostname.includes('vercel.app')) {
+    return '';
+  }
+  
+  // Si on accède directement via l'IP, utiliser HTTP
+  if (hostname === '217.154.172.35') {
     return 'http://217.154.172.35';
   }
   
