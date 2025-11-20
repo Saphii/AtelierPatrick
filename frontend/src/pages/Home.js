@@ -133,19 +133,29 @@ const DecorativeMarble = styled.div`
   
   /* Responsive : visible sur tous les écrans mais plus petites sur mobile */
   @media (max-width: 768px) {
-    width: ${props => (parseInt(props.size) * 0.6) || '36px'}px;
-    height: ${props => (parseInt(props.size) * 0.6) || '36px'}px;
-    opacity: 0.5;
-    margin: 15px;
-    min-top: 90px;
+    width: ${props => {
+      const sizeNum = parseInt(props.size) || 60;
+      return `${sizeNum * 0.7}px`;
+    }};
+    height: ${props => {
+      const sizeNum = parseInt(props.size) || 60;
+      return `${sizeNum * 0.7}px`;
+    }};
+    opacity: 0.6;
+    display: flex; /* S'assurer qu'elles sont visibles */
   }
   
   @media (max-width: 480px) {
-    width: ${props => (parseInt(props.size) * 0.5) || '30px'}px;
-    height: ${props => (parseInt(props.size) * 0.5) || '30px'}px;
-    opacity: 0.4;
-    margin: 10px;
-    min-top: 80px;
+    width: ${props => {
+      const sizeNum = parseInt(props.size) || 60;
+      return `${sizeNum * 0.6}px`;
+    }};
+    height: ${props => {
+      const sizeNum = parseInt(props.size) || 60;
+      return `${sizeNum * 0.6}px`;
+    }};
+    opacity: 0.5;
+    display: flex; /* S'assurer qu'elles sont visibles */
   }
 `;
 
@@ -704,17 +714,36 @@ const Home = () => {
   // Générer des billes aléatoirement
   useEffect(() => {
     const generateMarbles = () => {
+      // Mélanger les types pour une vraie répartition aléatoire
       const marbleTypes = ['wood', 'logo', '3d'];
+      const shuffledTypes = [...marbleTypes].sort(() => Math.random() - 0.5);
+      const typePool = [];
+      // Créer un pool avec chaque type répété 5 fois pour avoir 15 billes équilibrées
+      for (let i = 0; i < 5; i++) {
+        typePool.push(...shuffledTypes);
+      }
+      // Mélanger le pool
+      const finalTypePool = typePool.sort(() => Math.random() - 0.5);
+      
       const newMarbles = [];
       const occupiedPositions = [];
-      const minDistance = 120; // Distance minimale entre les billes
+      const minDistance = 100; // Distance minimale entre les billes
+      
+      // Calculer la hauteur totale de la page (pas seulement viewport)
+      const documentHeight = Math.max(
+        document.body.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.clientHeight,
+        document.documentElement.scrollHeight,
+        document.documentElement.offsetHeight
+      );
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const totalHeight = Math.max(viewportHeight, documentHeight);
       
       const isPositionValid = (x, y, size) => {
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        
         // Vérifier qu'on reste dans les limites de l'écran
-        if (x < 0 || x + size > viewportWidth || y < 100 || y + size > viewportHeight - 250) {
+        if (x < 20 || x + size > viewportWidth - 20 || y < 100 || y + size > totalHeight - 250) {
           return false;
         }
         
@@ -726,16 +755,19 @@ const Home = () => {
         
         // Vérifier si on est dans la zone HeroSection
         if (y >= heroTop && y + size <= heroBottom) {
-          if (x >= heroCenterX - heroWidth / 2 - 50 && x <= heroCenterX + heroWidth / 2 + 50) {
+          if (x >= heroCenterX - heroWidth / 2 - 60 && x <= heroCenterX + heroWidth / 2 + 60) {
             return false;
           }
         }
         
-        // Zone ServicesSection (centré, après HeroSection)
+        // Zone ServicesSection (centré, après HeroSection) - mais on permet les billes autour
         const servicesTop = viewportHeight - 400;
-        const servicesBottom = viewportHeight - 250;
+        const servicesBottom = viewportHeight - 100;
         if (y >= servicesTop && y + size <= servicesBottom) {
-          if (x >= heroCenterX - heroWidth / 2 - 50 && x <= heroCenterX + heroWidth / 2 + 50) {
+          // On permet les billes à gauche et à droite de la section Services
+          const servicesCenterX = viewportWidth / 2;
+          const servicesWidth = Math.min(1200, viewportWidth * 0.9);
+          if (x >= servicesCenterX - servicesWidth / 2 - 60 && x <= servicesCenterX + servicesWidth / 2 + 60) {
             return false;
           }
         }
@@ -752,29 +784,36 @@ const Home = () => {
         return true;
       };
 
-      // Générer 15 billes
+      // Générer 15 billes avec positions vraiment aléatoires
       let attempts = 0;
-      while (newMarbles.length < 15 && attempts < 1000) {
+      let typeIndex = 0;
+      
+      while (newMarbles.length < 15 && attempts < 2000) {
         attempts++;
         const size = 45 + Math.random() * 25; // Taille entre 45px et 70px
-        const x = size + Math.random() * (window.innerWidth - size * 2);
-        const y = 120 + Math.random() * (window.innerHeight - 370 - size); // Éviter header et footer
+        
+        // Positions vraiment aléatoires sur toute la hauteur disponible
+        const x = 20 + Math.random() * (viewportWidth - size - 40);
+        const y = 100 + Math.random() * (totalHeight - 350 - size); // Permettre sur toute la hauteur
         
         if (isPositionValid(x, y, size)) {
-          const type = marbleTypes[Math.floor(Math.random() * marbleTypes.length)];
-          const delay = Math.random() * 3;
+          // Utiliser le type du pool pour une répartition équilibrée
+          const type = finalTypePool[typeIndex % finalTypePool.length];
+          typeIndex++;
+          
+          const delay = Math.random() * 4;
           const duration = 8 + Math.random() * 4;
           
-          const opacity = 0.6 + Math.random() * 0.1;
+          const opacity = 0.6 + Math.random() * 0.15;
           newMarbles.push({
-            id: newMarbles.length,
+            id: `marble-${newMarbles.length}-${Date.now()}-${Math.random()}`, // ID unique
             left: x,
             top: y,
             size: `${size}px`,
             type,
-            delay: `${delay}s`,
-            duration: `${duration}s`,
-            gradient: `linear-gradient(135deg, rgba(139, 69, 19, ${opacity}), rgba(160, 82, 45, ${opacity}))`,
+            delay: `${delay.toFixed(2)}s`,
+            duration: `${duration.toFixed(2)}s`,
+            gradient: `linear-gradient(135deg, rgba(139, 69, 19, ${opacity.toFixed(2)}), rgba(160, 82, 45, ${opacity.toFixed(2)}))`,
           });
           
           occupiedPositions.push({ x, y, size });
@@ -784,15 +823,27 @@ const Home = () => {
       setMarbles(newMarbles);
     };
 
-    generateMarbles();
+    // Attendre que le DOM soit prêt
+    const timer = setTimeout(() => {
+      generateMarbles();
+    }, 100);
     
     // Régénérer au redimensionnement de la fenêtre
     const handleResize = () => {
-      generateMarbles();
+      clearTimeout(timer);
+      setTimeout(() => {
+        generateMarbles();
+      }, 200);
     };
     
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleResize);
+    
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleResize);
+    };
   }, []);
 
   useEffect(() => {
