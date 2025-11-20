@@ -79,11 +79,11 @@ const fadeInUp = keyframes`
 // Vidéos décoratives de chaque côté de la HeroSection (en dehors de la div)
 const VideoContainer = styled.div`
   position: absolute;
-  width: ${props => props.width || '300px'};
-  height: ${props => props.height || '400px'};
+  width: ${props => props.width || '380px'};
+  height: ${props => props.height || '480px'};
   ${props => props.side === 'left' 
-    ? 'left: calc((100vw - 900px) / 2 - 350px);' 
-    : 'right: calc((100vw - 900px) / 2 - 350px);'}
+    ? 'left: -420px;' 
+    : 'right: -420px;'}
   top: 50%;
   transform: translateY(-50%);
   border-radius: 20px;
@@ -148,10 +148,26 @@ const VideoContainer = styled.div`
     }
   }
   
+  @media (max-width: 1600px) {
+    ${props => props.side === 'left' 
+      ? 'left: -380px;' 
+      : 'right: -380px;'}
+    width: 320px;
+    height: 420px;
+  }
+  
   @media (max-width: 1400px) {
     ${props => props.side === 'left' 
-      ? 'left: 20px;' 
-      : 'right: 20px;'}
+      ? 'left: -340px;' 
+      : 'right: -340px;'}
+    width: 280px;
+    height: 380px;
+  }
+  
+  @media (max-width: 1200px) {
+    ${props => props.side === 'left' 
+      ? 'left: -300px;' 
+      : 'right: -300px;'}
     width: 250px;
     height: 350px;
   }
@@ -161,12 +177,12 @@ const VideoContainer = styled.div`
     width: 200px;
     height: 280px;
     ${props => props.side === 'left' 
-      ? 'left: 10px;' 
-      : 'right: 10px;'}
+      ? 'left: -240px;' 
+      : 'right: -240px;'}
   }
   
-  @media (max-width: 768px) {
-    display: none; /* Masquer sur mobile */
+  @media (max-width: 968px) {
+    display: none; /* Masquer sur tablette petite et mobile */
   }
 `;
 
@@ -811,21 +827,20 @@ const Home = () => {
   return (
     <>
       <HomeContainer>
-        {/* Vidéo à gauche (en dehors de HeroSection) */}
+      <HeroSection>
+        {/* Vidéo à gauche (dans HeroSection pour scroll avec elle) */}
         <VideoContainer side="left" delay="0.3s">
           <video autoPlay loop muted playsInline>
             <source src="/videos/laser.mp4" type="video/mp4" />
           </video>
         </VideoContainer>
 
-        {/* Vidéo à droite (en dehors de HeroSection) */}
+        {/* Vidéo à droite (dans HeroSection pour scroll avec elle) */}
         <VideoContainer side="right" delay="0.5s">
           <video autoPlay loop muted playsInline>
             <source src="/videos/imprimante.mp4" type="video/mp4" />
           </video>
         </VideoContainer>
-
-      <HeroSection>
         <div className="hero-content">
           <div className="logo-section">
             <div className="main-logo">
