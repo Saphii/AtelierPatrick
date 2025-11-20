@@ -61,23 +61,44 @@ const fadeInUp = keyframes`
   }
 `;
 
-// Animation de rebond pour les boules
-const bounce = keyframes`
-  0%, 100% {
-    transform: translateY(0) scale(1);
+// Animation de rebond horizontal (comme Pong) pour les boules
+const bounceHorizontal = keyframes`
+  0% {
+    transform: translateX(0) translateY(0) scale(1);
   }
   25% {
-    transform: translateY(-30px) scale(1.1);
+    transform: translateX(calc(100vw - 120px)) translateY(-15px) scale(1.1);
   }
   50% {
-    transform: translateY(-60px) scale(0.9);
+    transform: translateX(calc(100vw - 120px)) translateY(0) scale(0.9);
   }
   75% {
-    transform: translateY(-30px) scale(1.05);
+    transform: translateX(0) translateY(15px) scale(1.05);
+  }
+  100% {
+    transform: translateX(0) translateY(0) scale(1);
   }
 `;
 
-// Petites boules brunes qui rebondissent
+const bounceHorizontalReverse = keyframes`
+  0% {
+    transform: translateX(calc(100vw - 120px)) translateY(0) scale(1);
+  }
+  25% {
+    transform: translateX(0) translateY(-15px) scale(1.1);
+  }
+  50% {
+    transform: translateX(0) translateY(0) scale(0.9);
+  }
+  75% {
+    transform: translateX(calc(100vw - 120px)) translateY(15px) scale(1.05);
+  }
+  100% {
+    transform: translateX(calc(100vw - 120px)) translateY(0) scale(1);
+  }
+`;
+
+// Petites boules brunes qui rebondissent horizontalement (comme Pong) avec SVG à l'intérieur
 const BouncingBall = styled.div`
   position: fixed;
   width: ${props => props.size || '60px'};
@@ -87,73 +108,37 @@ const BouncingBall = styled.div`
   box-shadow: 0 4px 15px rgba(139, 69, 19, 0.4);
   pointer-events: none;
   z-index: 0;
-  opacity: 0.6;
-  ${props => props.left ? 'left: 20px;' : 'right: 20px;'}
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  left: ${props => props.startLeft ? '20px' : 'auto'};
+  right: ${props => props.startLeft ? 'auto' : '20px'};
   top: ${props => props.top || '20%'};
-  animation: ${bounce} ${props => props.duration || '2s'} ease-in-out infinite;
+  animation: ${props => props.reverse ? bounceHorizontalReverse : bounceHorizontal} ${props => props.duration || '8s'} linear infinite;
   animation-delay: ${props => props.delay || '0s'};
+  
+  svg {
+    width: 70%;
+    height: 70%;
+    opacity: 0.9;
+    filter: brightness(1.2) contrast(1.1);
+  }
+  
+  svg path[fill="currentColor"] {
+    fill: rgba(255, 255, 255, 0.9);
+  }
   
   @media (max-width: 1200px) {
     display: none;
   }
 `;
 
-const Flourish = styled.div`
-  position: absolute;
-  top: 50%;
-  width: 220px;
-  height: 220px;
-  margin-top: -110px;
-  pointer-events: none;
-  opacity: 0.65;
-  filter: drop-shadow(0 12px 25px rgba(0, 0, 0, 0.25));
-
-  @media (max-width: 1100px) {
-    display: none;
-  }
-`;
-
-const PrintFlourish = styled(Flourish)`
-  left: -80px;
-  background: url("/images/hero-print.svg") center/contain no-repeat;
-  animation: plotter 6s ease-in-out infinite;
-
-  @keyframes plotter {
-    0%,
-    100% {
-      transform: translateY(0) rotate(-4deg);
-    }
-    50% {
-      transform: translateY(-14px) rotate(0deg);
-    }
-  }
-`;
-
-const LaserFlourish = styled(Flourish)`
-  right: -80px;
-  background: url("/images/hero-laser.svg") center/contain no-repeat;
-  animation: laser 5.5s ease-in-out infinite;
-
-  @keyframes laser {
-    0%,
-    100% {
-      transform: translateY(0) rotate(5deg);
-      opacity: 0.55;
-    }
-    40% {
-      transform: translateY(-10px) rotate(0deg);
-      opacity: 0.95;
-    }
-    70% {
-      transform: translateY(-6px) rotate(2deg);
-      opacity: 0.75;
-    }
-  }
-`;
 
 const HeroSection = styled.section`
   position: relative;
-  min-height: calc(100vh - 100px);
+  min-height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
   display: flex;
   align-items: center;
   background: linear-gradient(
@@ -166,8 +151,8 @@ const HeroSection = styled.section`
   background-position: center;
   color: white;
   text-align: center;
-  padding: 80px 0;
-  margin: 40px 20px 80px 20px;
+  padding: 60px 0;
+  margin: 20px 20px 40px 20px;
   border-radius: 30px;
   overflow: hidden;
   z-index: 2;
@@ -710,19 +695,67 @@ const Home = () => {
 
   return (
     <HomeContainer>
-      {/* Petites boules brunes qui rebondissent sur les côtés */}
-      <BouncingBall left top="15%" size="50px" delay="0s" duration="2s" />
-      <BouncingBall left top="35%" size="40px" delay="0.4s" duration="2.2s" />
-      <BouncingBall left top="55%" size="45px" delay="0.8s" duration="2.4s" />
-      <BouncingBall left top="75%" size="35px" delay="1.2s" duration="2.1s" />
+      {/* Petites boules brunes qui rebondissent horizontalement (comme Pong) avec SVG */}
+      <BouncingBall startLeft top="15%" size="50px" delay="0s" duration="6s" reverse={false}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 36 36">
+          <path fill="#662113" d="M17.34 1.835C11.231 2.323 9 5.399 9 8.34c0 2.101-.348 17.904-.348 20.005s2.071 4.385 4.946 5.703c4.186 1.919 14.663 1.074 14.569-5.926c-.107-7.999.045-18.757.045-18.757c-.001-5.213-4.845-8.012-10.872-7.53z"/>
+          <path fill="#C1694F" d="M10.948 10.993c3.768 3.14 9.956 2.961 13.601 1.026c3.5-1.858 3.796-4.882 1.488-7.288C24.07 2.68 19.365 1.6 15.311 2.524c-4.561 1.04-8.058 5.389-4.363 8.469z"/>
+          <path fill="#FFE8B6" d="M11.949 10.568c3.271 2.726 8.37 2.407 11.807.891c3.147-1.389 3.52-4.01 1.292-6.327c-1.71-1.778-5.792-2.718-9.312-1.916c-3.959.902-6.995 4.678-3.787 7.352z"/>
+          <path fill="#662113" d="M9.142 15.03c-1.223-.876-3.315-2.484-3.81-2.804c-.81-.525-2.583 1.725-1.219 3.512s4.088 4.296 4.746 7.729c.659 3.433.283-8.437.283-8.437z"/>
+          <ellipse cx="4.876" cy="13.818" fill="#C1694F" rx="1.167" ry=".706" transform="rotate(-75.345 4.875 13.817)"/>
+          <path fill="#D99E82" d="M18.666 11.588c-2.247 0-4.511-.762-5.608-1.658c-.808-.66-1.223-1.544-1.138-2.425c.068-.703.489-1.723 2.109-2.591c2.326-1.247 4.73-1.616 6.949-1.069c2.296.564 4.698 2.357 4.477 4.026c-.236 1.768-3.604 3.299-5.267 3.59a8.84 8.84 0 0 1-1.522.127zm.273-6.988c-1.451 0-2.958.403-4.438 1.196c-.973.521-1.521 1.146-1.585 1.806c-.053.542.23 1.109.775 1.554c1.183.966 4.009 1.728 6.326 1.32c1.747-.306 4.313-1.742 4.447-2.737c.128-.962-1.752-2.438-3.724-2.923a7.491 7.491 0 0 0-1.801-.216z"/>
+          <path fill="#D99E82" d="M18.432 9.424c-.986 0-1.906-.24-2.423-.663c-.433-.354-.654-.835-.607-1.321c.037-.38.255-.926 1.084-1.371c.629-.337 2.067-.645 3.043-.544c1.105.111 2.625.869 2.589 1.853c-.059 1.524-1.646 1.789-2.697 1.964a6.026 6.026 0 0 1-.989.082zm.687-2.918c-.79 0-1.784.243-2.162.445c-.337.181-.542.394-.56.585c-.014.145.077.313.244.45c.402.329 1.489.556 2.615.37c1.406-.234 1.841-.472 1.861-1.016c-.039-.213-.846-.736-1.688-.82a3.4 3.4 0 0 0-.31-.014z"/>
+          <path fill="#292F33" d="m14.213 34.188l.401-6.282l.49 6.594zm11.985-1.648l.178-7.352l.49 6.594z"/>
+          <path fill="#C1694F" d="m15.639 22.827l.712-4.589l.09 4.99l.445 4.722zm5.257 11.138l-.178-9.98l.846 7.396zm2.762-13.812l.134-6.327l.511 3.574a.832.832 0 0 1-.019.333l-.626 2.42z"/>
+        </svg>
+      </BouncingBall>
       
-      <BouncingBall top="20%" size="55px" delay="0.2s" duration="2.3s" />
-      <BouncingBall top="40%" size="42px" delay="0.6s" duration="2.5s" />
-      <BouncingBall top="60%" size="48px" delay="1s" duration="2.2s" />
-      <BouncingBall top="80%" size="38px" delay="1.4s" duration="2.4s" />
+      <BouncingBall startLeft={false} top="25%" size="45px" delay="1s" duration="7s" reverse={true}>
+        <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M13 15h3q.825 0 1.413-.587T18 13v-2q0-.825-.587-1.412T16 9h-3zm1.5-1.5v-3H16q.2 0 .35.15t.15.35v2q0 .2-.15.35t-.35.15zm-8 1.5H10q.425 0 .713-.288T11 14v-1q0-.425-.288-.712T10 12q.425 0 .713-.288T11 11v-1q0-.425-.288-.712T10 9H6.5v1.5h3v.75h-2v1.5h2v.75h-3zM4 20q-.825 0-1.412-.587T2 18V6q0-.825.588-1.412T4 4h16q.825 0 1.413.588T22 6v12q0 .825-.587 1.413T20 20z"/>
+        </svg>
+      </BouncingBall>
+      
+      <BouncingBall startLeft top="40%" size="55px" delay="2s" duration="8s" reverse={false}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 36 36">
+          <path fill="#662113" d="M17.34 1.835C11.231 2.323 9 5.399 9 8.34c0 2.101-.348 17.904-.348 20.005s2.071 4.385 4.946 5.703c4.186 1.919 14.663 1.074 14.569-5.926c-.107-7.999.045-18.757.045-18.757c-.001-5.213-4.845-8.012-10.872-7.53z"/>
+          <path fill="#C1694F" d="M10.948 10.993c3.768 3.14 9.956 2.961 13.601 1.026c3.5-1.858 3.796-4.882 1.488-7.288C24.07 2.68 19.365 1.6 15.311 2.524c-4.561 1.04-8.058 5.389-4.363 8.469z"/>
+          <path fill="#FFE8B6" d="M11.949 10.568c3.271 2.726 8.37 2.407 11.807.891c3.147-1.389 3.52-4.01 1.292-6.327c-1.71-1.778-5.792-2.718-9.312-1.916c-3.959.902-6.995 4.678-3.787 7.352z"/>
+          <path fill="#662113" d="M9.142 15.03c-1.223-.876-3.315-2.484-3.81-2.804c-.81-.525-2.583 1.725-1.219 3.512s4.088 4.296 4.746 7.729c.659 3.433.283-8.437.283-8.437z"/>
+          <ellipse cx="4.876" cy="13.818" fill="#C1694F" rx="1.167" ry=".706" transform="rotate(-75.345 4.875 13.817)"/>
+          <path fill="#D99E82" d="M18.666 11.588c-2.247 0-4.511-.762-5.608-1.658c-.808-.66-1.223-1.544-1.138-2.425c.068-.703.489-1.723 2.109-2.591c2.326-1.247 4.73-1.616 6.949-1.069c2.296.564 4.698 2.357 4.477 4.026c-.236 1.768-3.604 3.299-5.267 3.59a8.84 8.84 0 0 1-1.522.127zm.273-6.988c-1.451 0-2.958.403-4.438 1.196c-.973.521-1.521 1.146-1.585 1.806c-.053.542.23 1.109.775 1.554c1.183.966 4.009 1.728 6.326 1.32c1.747-.306 4.313-1.742 4.447-2.737c.128-.962-1.752-2.438-3.724-2.923a7.491 7.491 0 0 0-1.801-.216z"/>
+          <path fill="#D99E82" d="M18.432 9.424c-.986 0-1.906-.24-2.423-.663c-.433-.354-.654-.835-.607-1.321c.037-.38.255-.926 1.084-1.371c.629-.337 2.067-.645 3.043-.544c1.105.111 2.625.869 2.589 1.853c-.059 1.524-1.646 1.789-2.697 1.964a6.026 6.026 0 0 1-.989.082zm.687-2.918c-.79 0-1.784.243-2.162.445c-.337.181-.542.394-.56.585c-.014.145.077.313.244.45c.402.329 1.489.556 2.615.37c1.406-.234 1.841-.472 1.861-1.016c-.039-.213-.846-.736-1.688-.82a3.4 3.4 0 0 0-.31-.014z"/>
+          <path fill="#292F33" d="m14.213 34.188l.401-6.282l.49 6.594zm11.985-1.648l.178-7.352l.49 6.594z"/>
+          <path fill="#C1694F" d="m15.639 22.827l.712-4.589l.09 4.99l.445 4.722zm5.257 11.138l-.178-9.98l.846 7.396zm2.762-13.812l.134-6.327l.511 3.574a.832.832 0 0 1-.019.333l-.626 2.42z"/>
+        </svg>
+      </BouncingBall>
+      
+      <BouncingBall startLeft={false} top="55%" size="48px" delay="3s" duration="6.5s" reverse={true}>
+        <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M13 15h3q.825 0 1.413-.587T18 13v-2q0-.825-.587-1.412T16 9h-3zm1.5-1.5v-3H16q.2 0 .35.15t.15.35v2q0 .2-.15.35t-.35.15zm-8 1.5H10q.425 0 .713-.288T11 14v-1q0-.425-.288-.712T10 12q.425 0 .713-.288T11 11v-1q0-.425-.288-.712T10 9H6.5v1.5h3v.75h-2v1.5h2v.75h-3zM4 20q-.825 0-1.412-.587T2 18V6q0-.825.588-1.412T4 4h16q.825 0 1.413.588T22 6v12q0 .825-.587 1.413T20 20z"/>
+        </svg>
+      </BouncingBall>
+      
+      <BouncingBall startLeft top="70%" size="52px" delay="1.5s" duration="7.5s" reverse={false}>
+        <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M13 15h3q.825 0 1.413-.587T18 13v-2q0-.825-.587-1.412T16 9h-3zm1.5-1.5v-3H16q.2 0 .35.15t.15.35v2q0 .2-.15.35t-.35.15zm-8 1.5H10q.425 0 .713-.288T11 14v-1q0-.425-.288-.712T10 12q.425 0 .713-.288T11 11v-1q0-.425-.288-.712T10 9H6.5v1.5h3v.75h-2v1.5h2v.75h-3zM4 20q-.825 0-1.412-.587T2 18V6q0-.825.588-1.412T4 4h16q.825 0 1.413.588T22 6v12q0 .825-.587 1.413T20 20z"/>
+        </svg>
+      </BouncingBall>
+      
+      <BouncingBall startLeft={false} top="85%" size="46px" delay="2.5s" duration="8.5s" reverse={true}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 36 36">
+          <path fill="#662113" d="M17.34 1.835C11.231 2.323 9 5.399 9 8.34c0 2.101-.348 17.904-.348 20.005s2.071 4.385 4.946 5.703c4.186 1.919 14.663 1.074 14.569-5.926c-.107-7.999.045-18.757.045-18.757c-.001-5.213-4.845-8.012-10.872-7.53z"/>
+          <path fill="#C1694F" d="M10.948 10.993c3.768 3.14 9.956 2.961 13.601 1.026c3.5-1.858 3.796-4.882 1.488-7.288C24.07 2.68 19.365 1.6 15.311 2.524c-4.561 1.04-8.058 5.389-4.363 8.469z"/>
+          <path fill="#FFE8B6" d="M11.949 10.568c3.271 2.726 8.37 2.407 11.807.891c3.147-1.389 3.52-4.01 1.292-6.327c-1.71-1.778-5.792-2.718-9.312-1.916c-3.959.902-6.995 4.678-3.787 7.352z"/>
+          <path fill="#662113" d="M9.142 15.03c-1.223-.876-3.315-2.484-3.81-2.804c-.81-.525-2.583 1.725-1.219 3.512s4.088 4.296 4.746 7.729c.659 3.433.283-8.437.283-8.437z"/>
+          <ellipse cx="4.876" cy="13.818" fill="#C1694F" rx="1.167" ry=".706" transform="rotate(-75.345 4.875 13.817)"/>
+          <path fill="#D99E82" d="M18.666 11.588c-2.247 0-4.511-.762-5.608-1.658c-.808-.66-1.223-1.544-1.138-2.425c.068-.703.489-1.723 2.109-2.591c2.326-1.247 4.73-1.616 6.949-1.069c2.296.564 4.698 2.357 4.477 4.026c-.236 1.768-3.604 3.299-5.267 3.59a8.84 8.84 0 0 1-1.522.127zm.273-6.988c-1.451 0-2.958.403-4.438 1.196c-.973.521-1.521 1.146-1.585 1.806c-.053.542.23 1.109.775 1.554c1.183.966 4.009 1.728 6.326 1.32c1.747-.306 4.313-1.742 4.447-2.737c.128-.962-1.752-2.438-3.724-2.923a7.491 7.491 0 0 0-1.801-.216z"/>
+          <path fill="#D99E82" d="M18.432 9.424c-.986 0-1.906-.24-2.423-.663c-.433-.354-.654-.835-.607-1.321c.037-.38.255-.926 1.084-1.371c.629-.337 2.067-.645 3.043-.544c1.105.111 2.625.869 2.589 1.853c-.059 1.524-1.646 1.789-2.697 1.964a6.026 6.026 0 0 1-.989.082zm.687-2.918c-.79 0-1.784.243-2.162.445c-.337.181-.542.394-.56.585c-.014.145.077.313.244.45c.402.329 1.489.556 2.615.37c1.406-.234 1.841-.472 1.861-1.016c-.039-.213-.846-.736-1.688-.82a3.4 3.4 0 0 0-.31-.014z"/>
+          <path fill="#292F33" d="m14.213 34.188l.401-6.282l.49 6.594zm11.985-1.648l.178-7.352l.49 6.594z"/>
+          <path fill="#C1694F" d="m15.639 22.827l.712-4.589l.09 4.99l.445 4.722zm5.257 11.138l-.178-9.98l.846 7.396zm2.762-13.812l.134-6.327l.511 3.574a.832.832 0 0 1-.019.333l-.626 2.42z"/>
+        </svg>
+      </BouncingBall>
 
-      <PrintFlourish aria-hidden="true" />
-      <LaserFlourish aria-hidden="true" />
       <HeroSection>
         <div className="hero-content">
           <div className="logo-section">
