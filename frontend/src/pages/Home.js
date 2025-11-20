@@ -92,8 +92,9 @@ const VideoContainer = styled.div`
   ${props => props.side === 'left' 
     ? 'left: -400px;' 
     : 'right: -400px;'}
-  top: 50%;
-  transform: translateY(-50%);
+  top: 0;
+  bottom: 0;
+  margin: auto;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 
@@ -146,7 +147,7 @@ const VideoContainer = styled.div`
   }
   
   &:hover {
-    transform: translateY(-50%) scale(1.05);
+    transform: scale(1.05);
     box-shadow: 
       0 25px 80px rgba(0, 0, 0, 0.4),
       0 0 60px rgba(139, 69, 19, 0.3);
@@ -201,12 +202,12 @@ const VideoContainer = styled.div`
 
 const HeroSection = styled.section`
   position: relative;
-  min-height: calc(100vh - 200px);
-  max-height: calc(100vh - 200px);
+  height: calc(100vh - 200px);
   max-width: 900px;
   margin: 20px auto 40px auto;
   display: flex;
   align-items: center;
+  justify-content: center;
   background: linear-gradient(
       135deg,
       rgba(139, 69, 19, 0.95),
@@ -232,8 +233,7 @@ const HeroSection = styled.section`
     max-width: 100%;
     padding: 40px 20px;
     margin: 15px 15px 30px 15px;
-    min-height: calc(100vh - 180px);
-    max-height: calc(100vh - 180px);
+    height: calc(100vh - 180px);
   }
   
   @media (max-width: 480px) {
