@@ -743,20 +743,17 @@ const Home = () => {
       const occupiedPositions = [];
       const minDistance = 80; // Distance minimale entre les billes (réduite pour en placer plus)
       
-      // Calculer la hauteur totale de la page (pas seulement viewport)
-      // Attendre un peu pour que le DOM soit complètement rendu
-      const documentHeight = Math.max(
-        document.body.scrollHeight || 0,
-        document.body.offsetHeight || 0,
-        document.documentElement.clientHeight || 0,
-        document.documentElement.scrollHeight || 0,
-        document.documentElement.offsetHeight || 0,
-        window.innerHeight || 0
-      );
+      // Calculer la hauteur totale de la page
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-      // Utiliser au minimum 2x la hauteur du viewport pour avoir de l'espace
-      const totalHeight = Math.max(viewportHeight * 2, documentHeight, 2000);
+      
+      // Estimer la hauteur totale en fonction du contenu
+      // HeroSection prend environ viewportHeight - 200px
+      // ServicesSection prend environ 600-800px
+      // Footer prend environ 250px
+      const estimatedTotalHeight = viewportHeight + 600 + 250; // Hero + Services + Footer
+      
+      const totalHeight = Math.max(estimatedTotalHeight, viewportHeight * 1.5);
       
       const isPositionValid = (x, y, size) => {
         // Vérifier qu'on reste dans les limites de l'écran
@@ -784,12 +781,13 @@ const Home = () => {
         }
         
         // Zone ServicesSection (centré, après HeroSection)
-        // On calcule mieux la position de la section Services
-        const servicesTop = Math.max(viewportHeight - 400, heroBottom + 100);
-        const servicesBottom = totalHeight - 250; // Juste avant le footer
-        const servicesPadding = 100; // Marge de sécurité augmentée autour de la ServicesSection
+        // La section Services commence après la HeroSection
+        const servicesTop = heroBottom + 50; // Après la HeroSection avec marge
+        const servicesBottom = servicesTop + 900; // La section Services fait environ 900px de haut
+        const servicesPadding = 130; // Marge de sécurité très importante autour de la ServicesSection
         
-        if (y + size >= servicesTop - 20 && y <= servicesBottom + 20) {
+        // Vérifier si on est dans la zone ServicesSection (avec marge généreuse)
+        if (y + size >= servicesTop - 40 && y <= servicesBottom + 40) {
           const servicesCenterX = viewportWidth / 2;
           const servicesWidth = Math.min(1200, viewportWidth * 0.9);
           const servicesLeft = servicesCenterX - servicesWidth / 2 - servicesPadding;
@@ -814,17 +812,92 @@ const Home = () => {
       // Générer 15 billes avec positions vraiment aléatoires
       let attempts = 0;
       let typeIndex = 0;
-      const margin = 30;
+      const margin = 40;
       
       // Réduire la taille minimale pour en placer plus
       const minSize = 40;
       const maxSize = 65;
       
-      while (newMarbles.length < 15 && attempts < 8000) {
+      // Calculer les positions exactes des sections pour créer des zones sûres
+      const heroCenterX = viewportWidth / 2;
+      const heroWidth = Math.min(1200, viewportWidth * 0.9);
+      const heroLeft = heroCenterX - heroWidth / 2;
+      const heroRight = heroCenterX + heroWidth / 2;
+      const servicesTop = heroBottom + 50;
+      const servicesBottom = servicesTop + 800;
+      const servicesLeft = heroLeft;
+      const servicesRight = heroRight;
+      const footerTop = totalHeight - 250;
+      const safePadding = 120; // Marge de sécurité importante
+      
+      // Créer des zones de placement en évitant les sections (6 zones bien définies)
+      const zones = [
+        // Zone 1: Gauche haut (avant et à côté de HeroSection)
+        { minX: margin, maxX: Math.max(margin + 80, heroLeft - safePadding), minY: 100, maxY: heroBottom - 50 },
+        // Zone 2: Droite haut (avant et à côté de HeroSection)
+        { minX: Math.min(viewportWidth - margin - 80, heroRight + safePadding), maxX: viewportWidth - margin, minY: 100, maxY: heroBottom - 50 },
+        // Zone 3: Gauche milieu (entre HeroSection et ServicesSection)
+        { minX: margin, maxX: Math.max(margin + 80, heroLeft - safePadding), minY: heroBottom + 50, maxY: servicesTop - 50 },
+        // Zone 4: Droite milieu (entre HeroSection et ServicesSection)
+        { minX: Math.min(viewportWidth - margin - 80, heroRight + safePadding), maxX: viewportWidth - margin, minY: heroBottom + 50, maxY: servicesTop - 50 },
+        // Zone 5: Gauche bas (après ServicesSection)
+        { minX: margin, maxX: Math.max(margin + 80, servicesLeft - safePadding), minY: servicesBottom + 50, maxY: footerTop - 100 },
+        // Zone 6: Droite bas (après ServicesSection)
+        { minX: Math.min(viewportWidth - margin - 80, servicesRight + safePadding), maxX: viewportWidth - margin, minY: servicesBottom + 50, maxY: footerTop - 100 },
+      ].filter(zone => zone.maxX > zone.minX + 100 && zone.maxY > zone.minY + 100); // Filtrer les zones valides
+      
+      // Répartir équitablement les billes dans les zones
+      const targetMarbles = 15;
+      const marblesPerZone = Math.ceil(targetMarbles / zones.length);
+      
+      zones.forEach((zone) => {
+        let zoneAttempts = 0;
+        let zoneMarbles = 0;
+        
+        while (zoneMarbles < marblesPerZone && newMarbles.length < targetMarbles && zoneAttempts < 3000) {
+          zoneAttempts++;
+          attempts++;
+          const size = minSize + Math.random() * (maxSize - minSize);
+          
+          const availableWidth = Math.max(0, zone.maxX - zone.minX - size);
+          const availableHeight = Math.max(0, zone.maxY - zone.minY - size);
+          
+          if (availableWidth > 0 && availableHeight > 0) {
+            const x = zone.minX + Math.random() * availableWidth;
+            const y = zone.minY + Math.random() * availableHeight;
+            
+            if (isPositionValid(x, y, size)) {
+              // Utiliser le type du pool pour une répartition équilibrée
+              const type = finalTypePool[typeIndex % finalTypePool.length];
+              typeIndex++;
+              
+              const delay = Math.random() * 4;
+              const duration = 8 + Math.random() * 4;
+              
+              const opacity = 0.6 + Math.random() * 0.15;
+              newMarbles.push({
+                id: `marble-${newMarbles.length}-${Date.now()}-${Math.random()}`, // ID unique
+                left: x,
+                top: y,
+                size: `${size}px`,
+                type,
+                delay: `${delay.toFixed(2)}s`,
+                duration: `${duration.toFixed(2)}s`,
+                gradient: `linear-gradient(135deg, rgba(139, 69, 19, ${opacity.toFixed(2)}), rgba(160, 82, 45, ${opacity.toFixed(2)}))`,
+              });
+              
+              occupiedPositions.push({ x, y, size });
+              zoneMarbles++;
+            }
+          }
+        }
+      });
+      
+      // Si on n'a pas assez de billes, continuer avec placement aléatoire global
+      while (newMarbles.length < 15 && attempts < 10000) {
         attempts++;
         const size = minSize + Math.random() * (maxSize - minSize);
         
-        // Positions vraiment aléatoires sur toute la hauteur disponible
         const x = margin + Math.random() * (viewportWidth - size - margin * 2);
         const footerTop = totalHeight - 250;
         const maxY = Math.max(200, footerTop - size - margin);
@@ -832,7 +905,6 @@ const Home = () => {
         const y = minY + Math.random() * (maxY - minY);
         
         if (isPositionValid(x, y, size)) {
-          // Utiliser le type du pool pour une répartition équilibrée
           const type = finalTypePool[typeIndex % finalTypePool.length];
           typeIndex++;
           
@@ -841,7 +913,7 @@ const Home = () => {
           
           const opacity = 0.6 + Math.random() * 0.15;
           newMarbles.push({
-            id: `marble-${newMarbles.length}-${Date.now()}-${Math.random()}`, // ID unique
+            id: `marble-${newMarbles.length}-${Date.now()}-${Math.random()}`,
             left: x,
             top: y,
             size: `${size}px`,
@@ -855,14 +927,14 @@ const Home = () => {
         }
       }
 
-      console.log(`Généré ${newMarbles.length} billes sur 15 tentatives`);
+      console.log(`Généré ${newMarbles.length} billes sur ${attempts} tentatives, zones utilisées: ${zones.length}`);
       setMarbles(newMarbles);
     };
 
     // Attendre que le DOM soit prêt et que les sections soient rendues
     const timer = setTimeout(() => {
       generateMarbles();
-    }, 500); // Augmenté pour laisser le temps au DOM de se charger
+    }, 800); // Augmenté pour laisser le temps au DOM de se charger complètement
     
     // Régénérer uniquement au redimensionnement de la fenêtre (pas au scroll)
     let resizeTimer;
