@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { FaArrowRight, FaCube, FaHammer, FaPen, FaStar } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
@@ -18,17 +18,6 @@ const HomeContainer = styled.div`
   }
 `;
 
-// Container pour les billes (position absolute pour couvrir toute la page)
-const MarblesContainer = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  min-height: 100vh;
-  pointer-events: none;
-  z-index: 0;
-  overflow: visible;
-`;
 
 // Animations pour les éléments décoratifs
 const float = keyframes`
@@ -80,96 +69,83 @@ const fadeInUp = keyframes`
   }
 `;
 
-// Animation d'apparition/disparition douce pour les billes décoratives
-const fadeInOut = keyframes`
-  0% {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  10% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  90% {
-    opacity: 1;
-    transform: scale(1);
-  }
-    100% {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-`;
-
-// Billes décoratives en fond d'écran (statiques, avec fade in/out)
-const DecorativeMarble = styled.div`
+// Vidéos décoratives de chaque côté de la HeroSection
+const VideoContainer = styled.div`
   position: absolute;
-  width: ${props => props.size || '60px'};
-  height: ${props => props.size || '60px'};
-  border-radius: 50%;
-  background: ${props => props.gradient || 'linear-gradient(135deg, rgba(139, 69, 19, 0.6), rgba(160, 82, 45, 0.6))'};
+  width: ${props => props.width || '300px'};
+  height: ${props => props.height || '400px'};
+  ${props => props.side === 'left' ? 'left: 20px;' : 'right: 20px;'}
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 20px;
+  overflow: hidden;
   box-shadow: 
-    0 8px 20px rgba(139, 69, 19, 0.3),
-    inset 0 2px 10px rgba(255, 255, 255, 0.2),
-    inset 0 -2px 10px rgba(0, 0, 0, 0.2);
-  pointer-events: none;
-  z-index: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  left: ${props => typeof props.left === 'number' ? `${props.left}px` : props.left || 'auto'};
-  top: ${props => typeof props.top === 'number' ? `${props.top}px` : props.top || 'auto'};
-  animation: ${fadeInOut} ${props => props.duration || '8s'} ease-in-out infinite;
-  animation-delay: ${props => props.delay || '0s'};
-  backdrop-filter: blur(2px);
-  will-change: opacity, transform; /* Optimisation pour les animations */
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    0 0 40px rgba(139, 69, 19, 0.2);
+  z-index: 1;
+  opacity: 0;
+  animation: ${fadeInUp} 1s ease-out ${props => props.delay || '0.5s'} forwards;
+  border: 3px solid rgba(139, 69, 19, 0.3);
+  background: rgba(139, 69, 19, 0.1);
+  backdrop-filter: blur(5px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   
-  /* Limiter la zone pour éviter header (80px) et footer (environ 200px) */
-  /* Les positions top/bottom sont gérées via les props */
-  
-  svg {
-    width: 75%;
-    height: 75%;
-    opacity: 0.85;
-    filter: brightness(1.1) contrast(1.1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
   
-  svg path[fill="currentColor"] {
-    fill: rgba(255, 255, 255, 0.9);
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(139, 69, 19, 0.1) 0%,
+      transparent 50%,
+      rgba(160, 82, 45, 0.1) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
   }
   
-  img {
-    width: 75%;
-    height: 75%;
-    object-fit: contain;
-    opacity: 0.85;
-    filter: brightness(1.1) contrast(1.1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  &::after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, rgba(139, 69, 19, 0.5), rgba(160, 82, 45, 0.5));
+    border-radius: 20px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
   }
   
-  /* Responsive : visible sur tous les écrans mais plus petites sur mobile */
-  @media (max-width: 768px) {
-    width: ${props => {
-      const sizeNum = parseInt(props.size) || 60;
-      return `${sizeNum * 0.7}px`;
-    }};
-    height: ${props => {
-      const sizeNum = parseInt(props.size) || 60;
-      return `${sizeNum * 0.7}px`;
-    }};
-    opacity: 0.6;
-    display: flex; /* S'assurer qu'elles sont visibles */
+  &:hover {
+    transform: translateY(-50%) scale(1.05);
+    box-shadow: 
+      0 25px 80px rgba(0, 0, 0, 0.4),
+      0 0 60px rgba(139, 69, 19, 0.3);
+    
+    &::after {
+      opacity: 1;
+    }
   }
   
-  @media (max-width: 480px) {
-    width: ${props => {
-      const sizeNum = parseInt(props.size) || 60;
-      return `${sizeNum * 0.6}px`;
-    }};
-    height: ${props => {
-      const sizeNum = parseInt(props.size) || 60;
-      return `${sizeNum * 0.6}px`;
-    }};
-    opacity: 0.5;
-    display: flex; /* S'assurer qu'elles sont visibles */
+  @media (max-width: 1200px) {
+    width: 250px;
+    height: 350px;
+  }
+  
+  @media (max-width: 968px) {
+    display: none; /* Masquer sur tablette et mobile */
   }
 `;
 
@@ -723,236 +699,6 @@ const TestimonialCard = styled.div`
 
 const Home = () => {
   const servicesRef = useRef(null);
-  const [marbles, setMarbles] = useState([]);
-
-  // Générer des billes aléatoirement
-  useEffect(() => {
-    const generateMarbles = () => {
-      // Mélanger les types pour une vraie répartition aléatoire
-      const marbleTypes = ['wood', 'logo', '3d'];
-      const shuffledTypes = [...marbleTypes].sort(() => Math.random() - 0.5);
-      const typePool = [];
-      // Créer un pool avec chaque type répété 5 fois pour avoir 15 billes équilibrées
-      for (let i = 0; i < 5; i++) {
-        typePool.push(...shuffledTypes);
-      }
-      // Mélanger le pool
-      const finalTypePool = typePool.sort(() => Math.random() - 0.5);
-      
-      const newMarbles = [];
-      const occupiedPositions = [];
-      const minDistance = 80; // Distance minimale entre les billes (réduite pour en placer plus)
-      
-      // Calculer la hauteur totale de la page
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-      
-      // Estimer la hauteur totale en fonction du contenu
-      // HeroSection prend environ viewportHeight - 200px
-      // ServicesSection prend environ 600-800px
-      // Footer prend environ 250px
-      const estimatedTotalHeight = viewportHeight + 600 + 250; // Hero + Services + Footer
-      
-      const totalHeight = Math.max(estimatedTotalHeight, viewportHeight * 1.5);
-      
-      const isPositionValid = (x, y, size) => {
-        // Vérifier qu'on reste dans les limites de l'écran
-        const footerTop = totalHeight - 250;
-        const margin = 30; // Marge de sécurité
-        
-        if (x < margin || x + size > viewportWidth - margin || y < 100 || y > footerTop - size) {
-          return false;
-        }
-        
-        // Zone HeroSection (centré, environ 1200px de large max)
-        const heroCenterX = viewportWidth / 2;
-        const heroWidth = Math.min(1200, viewportWidth * 0.9);
-        const heroTop = 100;
-        const heroBottom = viewportHeight - 200;
-        const heroPadding = 100; // Marge de sécurité augmentée autour de la HeroSection
-        
-        // Vérifier si on est dans la zone HeroSection (avec marge)
-        if (y + size >= heroTop - 20 && y <= heroBottom + 20) {
-          const heroLeft = heroCenterX - heroWidth / 2 - heroPadding;
-          const heroRight = heroCenterX + heroWidth / 2 + heroPadding;
-          if (x + size >= heroLeft && x <= heroRight) {
-            return false;
-          }
-        }
-        
-        // Zone ServicesSection (centré, après HeroSection)
-        // La section Services commence après la HeroSection
-        const servicesTop = heroBottom + 50; // Après la HeroSection avec marge
-        const servicesBottom = servicesTop + 900; // La section Services fait environ 900px de haut
-        const servicesPadding = 130; // Marge de sécurité très importante autour de la ServicesSection
-        
-        // Vérifier si on est dans la zone ServicesSection (avec marge généreuse)
-        if (y + size >= servicesTop - 40 && y <= servicesBottom + 40) {
-          const servicesCenterX = viewportWidth / 2;
-          const servicesWidth = Math.min(1200, viewportWidth * 0.9);
-          const servicesLeft = servicesCenterX - servicesWidth / 2 - servicesPadding;
-          const servicesRight = servicesCenterX + servicesWidth / 2 + servicesPadding;
-          if (x + size >= servicesLeft && x <= servicesRight) {
-            return false;
-          }
-        }
-
-        // Vérifier qu'on ne se superpose pas avec d'autres billes
-        for (const pos of occupiedPositions) {
-          const distance = Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2));
-          const minDist = minDistance + (size + pos.size) / 2;
-          if (distance < minDist) {
-            return false;
-          }
-        }
-
-        return true;
-      };
-
-      // Générer 15 billes avec positions vraiment aléatoires
-      let attempts = 0;
-      let typeIndex = 0;
-      const margin = 40;
-      
-      // Réduire la taille minimale pour en placer plus
-      const minSize = 40;
-      const maxSize = 65;
-      
-      // Calculer les positions exactes des sections pour créer des zones sûres
-      const heroCenterX = viewportWidth / 2;
-      const heroWidth = Math.min(1200, viewportWidth * 0.9);
-      const heroLeft = heroCenterX - heroWidth / 2;
-      const heroRight = heroCenterX + heroWidth / 2;
-      const servicesTop = heroBottom + 50;
-      const servicesBottom = servicesTop + 800;
-      const servicesLeft = heroLeft;
-      const servicesRight = heroRight;
-      const footerTop = totalHeight - 250;
-      const safePadding = 120; // Marge de sécurité importante
-      
-      // Créer des zones de placement en évitant les sections (6 zones bien définies)
-      const zones = [
-        // Zone 1: Gauche haut (avant et à côté de HeroSection)
-        { minX: margin, maxX: Math.max(margin + 80, heroLeft - safePadding), minY: 100, maxY: heroBottom - 50 },
-        // Zone 2: Droite haut (avant et à côté de HeroSection)
-        { minX: Math.min(viewportWidth - margin - 80, heroRight + safePadding), maxX: viewportWidth - margin, minY: 100, maxY: heroBottom - 50 },
-        // Zone 3: Gauche milieu (entre HeroSection et ServicesSection)
-        { minX: margin, maxX: Math.max(margin + 80, heroLeft - safePadding), minY: heroBottom + 50, maxY: servicesTop - 50 },
-        // Zone 4: Droite milieu (entre HeroSection et ServicesSection)
-        { minX: Math.min(viewportWidth - margin - 80, heroRight + safePadding), maxX: viewportWidth - margin, minY: heroBottom + 50, maxY: servicesTop - 50 },
-        // Zone 5: Gauche bas (après ServicesSection)
-        { minX: margin, maxX: Math.max(margin + 80, servicesLeft - safePadding), minY: servicesBottom + 50, maxY: footerTop - 100 },
-        // Zone 6: Droite bas (après ServicesSection)
-        { minX: Math.min(viewportWidth - margin - 80, servicesRight + safePadding), maxX: viewportWidth - margin, minY: servicesBottom + 50, maxY: footerTop - 100 },
-      ].filter(zone => zone.maxX > zone.minX + 100 && zone.maxY > zone.minY + 100); // Filtrer les zones valides
-      
-      // Répartir équitablement les billes dans les zones
-      const targetMarbles = 15;
-      const marblesPerZone = Math.ceil(targetMarbles / zones.length);
-      
-      zones.forEach((zone) => {
-        let zoneAttempts = 0;
-        let zoneMarbles = 0;
-        
-        while (zoneMarbles < marblesPerZone && newMarbles.length < targetMarbles && zoneAttempts < 3000) {
-          zoneAttempts++;
-          attempts++;
-          const size = minSize + Math.random() * (maxSize - minSize);
-          
-          const availableWidth = Math.max(0, zone.maxX - zone.minX - size);
-          const availableHeight = Math.max(0, zone.maxY - zone.minY - size);
-          
-          if (availableWidth > 0 && availableHeight > 0) {
-            const x = zone.minX + Math.random() * availableWidth;
-            const y = zone.minY + Math.random() * availableHeight;
-            
-            if (isPositionValid(x, y, size)) {
-              // Utiliser le type du pool pour une répartition équilibrée
-              const type = finalTypePool[typeIndex % finalTypePool.length];
-              typeIndex++;
-              
-              const delay = Math.random() * 4;
-              const duration = 8 + Math.random() * 4;
-              
-              const opacity = 0.6 + Math.random() * 0.15;
-              newMarbles.push({
-                id: `marble-${newMarbles.length}-${Date.now()}-${Math.random()}`, // ID unique
-                left: x,
-                top: y,
-                size: `${size}px`,
-                type,
-                delay: `${delay.toFixed(2)}s`,
-                duration: `${duration.toFixed(2)}s`,
-                gradient: `linear-gradient(135deg, rgba(139, 69, 19, ${opacity.toFixed(2)}), rgba(160, 82, 45, ${opacity.toFixed(2)}))`,
-              });
-              
-              occupiedPositions.push({ x, y, size });
-              zoneMarbles++;
-            }
-          }
-        }
-      });
-      
-      // Si on n'a pas assez de billes, continuer avec placement aléatoire global
-      while (newMarbles.length < 15 && attempts < 10000) {
-        attempts++;
-        const size = minSize + Math.random() * (maxSize - minSize);
-        
-        const x = margin + Math.random() * (viewportWidth - size - margin * 2);
-        const footerTop = totalHeight - 250;
-        const maxY = Math.max(200, footerTop - size - margin);
-        const minY = 100;
-        const y = minY + Math.random() * (maxY - minY);
-        
-        if (isPositionValid(x, y, size)) {
-          const type = finalTypePool[typeIndex % finalTypePool.length];
-          typeIndex++;
-          
-          const delay = Math.random() * 4;
-          const duration = 8 + Math.random() * 4;
-          
-          const opacity = 0.6 + Math.random() * 0.15;
-          newMarbles.push({
-            id: `marble-${newMarbles.length}-${Date.now()}-${Math.random()}`,
-            left: x,
-            top: y,
-            size: `${size}px`,
-            type,
-            delay: `${delay.toFixed(2)}s`,
-            duration: `${duration.toFixed(2)}s`,
-            gradient: `linear-gradient(135deg, rgba(139, 69, 19, ${opacity.toFixed(2)}), rgba(160, 82, 45, ${opacity.toFixed(2)}))`,
-          });
-          
-          occupiedPositions.push({ x, y, size });
-        }
-      }
-
-      console.log(`Généré ${newMarbles.length} billes sur ${attempts} tentatives, zones utilisées: ${zones.length}`);
-      setMarbles(newMarbles);
-    };
-
-    // Attendre que le DOM soit prêt et que les sections soient rendues
-    const timer = setTimeout(() => {
-      generateMarbles();
-    }, 800); // Augmenté pour laisser le temps au DOM de se charger complètement
-    
-    // Régénérer uniquement au redimensionnement de la fenêtre (pas au scroll)
-    let resizeTimer;
-    const handleResize = () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        generateMarbles();
-      }, 300);
-    };
-    
-    window.addEventListener('resize', handleResize);
-    
-    return () => {
-      clearTimeout(timer);
-      clearTimeout(resizeTimer);
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -973,62 +719,23 @@ const Home = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Composants pour les différents types de logos
-  const WoodLogSVG = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 36 36">
-      <path fill="#662113" d="M17.34 1.835C11.231 2.323 9 5.399 9 8.34c0 2.101-.348 17.904-.348 20.005s2.071 4.385 4.946 5.703c4.186 1.919 14.663 1.074 14.569-5.926c-.107-7.999.045-18.757.045-18.757c-.001-5.213-4.845-8.012-10.872-7.53z"/>
-      <path fill="#C1694F" d="M10.948 10.993c3.768 3.14 9.956 2.961 13.601 1.026c3.5-1.858 3.796-4.882 1.488-7.288C24.07 2.68 19.365 1.6 15.311 2.524c-4.561 1.04-8.058 5.389-4.363 8.469z"/>
-      <path fill="#FFE8B6" d="M11.949 10.568c3.271 2.726 8.37 2.407 11.807.891c3.147-1.389 3.52-4.01 1.292-6.327c-1.71-1.778-5.792-2.718-9.312-1.916c-3.959.902-6.995 4.678-3.787 7.352z"/>
-      <path fill="#662113" d="M9.142 15.03c-1.223-.876-3.315-2.484-3.81-2.804c-.81-.525-2.583 1.725-1.219 3.512s4.088 4.296 4.746 7.729c.659 3.433.283-8.437.283-8.437z"/>
-      <ellipse cx="4.876" cy="13.818" fill="#C1694F" rx="1.167" ry=".706" transform="rotate(-75.345 4.875 13.817)"/>
-      <path fill="#D99E82" d="M18.666 11.588c-2.247 0-4.511-.762-5.608-1.658c-.808-.66-1.223-1.544-1.138-2.425c.068-.703.489-1.723 2.109-2.591c2.326-1.247 4.73-1.616 6.949-1.069c2.296.564 4.698 2.357 4.477 4.026c-.236 1.768-3.604 3.299-5.267 3.59a8.84 8.84 0 0 1-1.522.127zm.273-6.988c-1.451 0-2.958.403-4.438 1.196c-.973.521-1.521 1.146-1.585 1.806c-.053.542.23 1.109.775 1.554c1.183.966 4.009 1.728 6.326 1.32c1.747-.306 4.313-1.742 4.447-2.737c.128-.962-1.752-2.438-3.724-2.923a7.491 7.491 0 0 0-1.801-.216z"/>
-      <path fill="#D99E82" d="M18.432 9.424c-.986 0-1.906-.24-2.423-.663c-.433-.354-.654-.835-.607-1.321c.037-.38.255-.926 1.084-1.371c.629-.337 2.067-.645 3.043-.544c1.105.111 2.625.869 2.589 1.853c-.059 1.524-1.646 1.789-2.697 1.964a6.026 6.026 0 0 1-.989.082zm.687-2.918c-.79 0-1.784.243-2.162.445c-.337.181-.542.394-.56.585c-.014.145.077.313.244.45c.402.329 1.489.556 2.615.37c1.406-.234 1.841-.472 1.861-1.016c-.039-.213-.846-.736-1.688-.82a3.4 3.4 0 0 0-.31-.014z"/>
-      <path fill="#292F33" d="m14.213 34.188l.401-6.282l.49 6.594zm11.985-1.648l.178-7.352l.49 6.594z"/>
-      <path fill="#C1694F" d="m15.639 22.827l.712-4.589l.09 4.99l.445 4.722zm5.257 11.138l-.178-9.98l.846 7.396zm2.762-13.812l.134-6.327l.511 3.574a.832.832 0 0 1-.019.333l-.626 2.42z"/>
-    </svg>
-  );
-
-  const Logo3DSVG = () => (
-    <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-      <path fill="currentColor" d="M13 15h3q.825 0 1.413-.587T18 13v-2q0-.825-.587-1.412T16 9h-3zm1.5-1.5v-3H16q.2 0 .35.15t.15.35v2q0 .2-.15.35t-.35.15zm-8 1.5H10q.425 0 .713-.288T11 14v-1q0-.425-.288-.712T10 12q.425 0 .713-.288T11 11v-1q0-.425-.288-.712T10 9H6.5v1.5h3v.75h-2v1.5h2v.75h-3zM4 20q-.825 0-1.412-.587T2 18V6q0-.825.588-1.412T4 4h16q.825 0 1.413.588T22 6v12q0 .825-.587 1.413T20 20z"/>
-    </svg>
-  );
-
-  const renderMarbleContent = (type) => {
-    switch(type) {
-      case 'wood':
-        return <WoodLogSVG />;
-      case '3d':
-        return <Logo3DSVG />;
-      case 'logo':
-        return <img src="/images/logo_patrick.png" alt="Logo Atelier de Patrick" />;
-      default:
-        return <WoodLogSVG />;
-    }
-  };
-
   return (
     <>
-      {/* Container pour les billes (en dehors du HomeContainer pour couvrir toute la page) */}
-      <MarblesContainer>
-        {marbles.map((marble) => (
-          <DecorativeMarble
-            key={marble.id}
-            left={marble.left}
-            top={marble.top}
-            size={marble.size}
-            delay={marble.delay}
-            duration={marble.duration}
-            gradient={marble.gradient}
-          >
-            {renderMarbleContent(marble.type)}
-          </DecorativeMarble>
-        ))}
-      </MarblesContainer>
-      
       <HomeContainer>
-
       <HeroSection>
+        {/* Vidéo à gauche */}
+        <VideoContainer side="left" delay="0.3s">
+          <video autoPlay loop muted playsInline>
+            <source src="/videos/laser.mp4" type="video/mp4" />
+          </video>
+        </VideoContainer>
+
+        {/* Vidéo à droite */}
+        <VideoContainer side="right" delay="0.5s">
+          <video autoPlay loop muted playsInline>
+            <source src="/videos/imprimante.mp4" type="video/mp4" />
+          </video>
+        </VideoContainer>
         <div className="hero-content">
           <div className="logo-section">
             <div className="main-logo">
