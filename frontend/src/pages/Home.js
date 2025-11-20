@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 
 const HomeContainer = styled.div`
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 20px;
   position: relative;
@@ -69,13 +69,15 @@ const fadeInUp = keyframes`
   }
 `;
 
-// Vidéos décoratives de chaque côté de la HeroSection
+// Vidéos décoratives de chaque côté de la HeroSection (en dehors de la div)
 const VideoContainer = styled.div`
-  position: absolute;
-  width: ${props => props.width || '300px'};
-  height: ${props => props.height || '400px'};
-  ${props => props.side === 'left' ? 'left: 20px;' : 'right: 20px;'}
-  top: 50%;
+  position: fixed;
+  width: ${props => props.width || '350px'};
+  height: ${props => props.height || '450px'};
+  ${props => props.side === 'left' 
+    ? 'left: max(20px, calc((100vw - 1400px) / 2 - 400px));' 
+    : 'right: max(20px, calc((100vw - 1400px) / 2 - 400px));'}
+  top: 50vh;
   transform: translateY(-50%);
   border-radius: 20px;
   overflow: hidden;
@@ -140,8 +142,8 @@ const VideoContainer = styled.div`
   }
   
   @media (max-width: 1200px) {
-    width: 250px;
-    height: 350px;
+    width: 280px;
+    height: 380px;
   }
   
   @media (max-width: 968px) {
@@ -722,20 +724,21 @@ const Home = () => {
   return (
     <>
       <HomeContainer>
-      <HeroSection>
-        {/* Vidéo à gauche */}
+        {/* Vidéo à gauche (en dehors de HeroSection) */}
         <VideoContainer side="left" delay="0.3s">
           <video autoPlay loop muted playsInline>
             <source src="/videos/laser.mp4" type="video/mp4" />
           </video>
         </VideoContainer>
 
-        {/* Vidéo à droite */}
+        {/* Vidéo à droite (en dehors de HeroSection) */}
         <VideoContainer side="right" delay="0.5s">
           <video autoPlay loop muted playsInline>
             <source src="/videos/imprimante.mp4" type="video/mp4" />
           </video>
         </VideoContainer>
+
+      <HeroSection>
         <div className="hero-content">
           <div className="logo-section">
             <div className="main-logo">
