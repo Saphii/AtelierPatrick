@@ -6,14 +6,22 @@ import styled, { keyframes } from "styled-components";
 const HomeContainer = styled.div`
   max-width: 100%;
   margin: 0 auto;
-  padding: 0;
+  padding: 0 50px;
   position: relative;
   overflow-x: hidden;
   z-index: 1;
   min-height: 100vh;
   
+  @media (max-width: 1600px) {
+    padding: 0 30px;
+  }
+  
+  @media (max-width: 1400px) {
+    padding: 0 20px;
+  }
+  
   @media (max-width: 1024px) {
-    padding: 0 10px;
+    padding: 0 15px;
   }
   
   @media (max-width: 768px) {
@@ -79,11 +87,11 @@ const fadeInUp = keyframes`
 // Vidéos décoratives de chaque côté de la HeroSection (en dehors de la div)
 const VideoContainer = styled.div`
   position: absolute;
-  width: ${props => props.width || '380px'};
-  height: ${props => props.height || '480px'};
+  width: ${props => props.width || '350px'};
+  height: ${props => props.height || '450px'};
   ${props => props.side === 'left' 
-    ? 'left: -420px;' 
-    : 'right: -420px;'}
+    ? 'left: -400px;' 
+    : 'right: -400px;'}
   top: 50%;
   transform: translateY(-50%);
   border-radius: 20px;
@@ -150,24 +158,24 @@ const VideoContainer = styled.div`
   
   @media (max-width: 1600px) {
     ${props => props.side === 'left' 
-      ? 'left: -380px;' 
-      : 'right: -380px;'}
+      ? 'left: -360px;' 
+      : 'right: -360px;'}
     width: 320px;
     height: 420px;
   }
   
   @media (max-width: 1400px) {
     ${props => props.side === 'left' 
-      ? 'left: -340px;' 
-      : 'right: -340px;'}
+      ? 'left: -320px;' 
+      : 'right: -320px;'}
     width: 280px;
     height: 380px;
   }
   
   @media (max-width: 1200px) {
     ${props => props.side === 'left' 
-      ? 'left: -300px;' 
-      : 'right: -300px;'}
+      ? 'left: -280px;' 
+      : 'right: -280px;'}
     width: 250px;
     height: 350px;
   }
@@ -177,8 +185,8 @@ const VideoContainer = styled.div`
     width: 200px;
     height: 280px;
     ${props => props.side === 'left' 
-      ? 'left: -240px;' 
-      : 'right: -240px;'}
+      ? 'left: -230px;' 
+      : 'right: -230px;'}
   }
   
   @media (max-width: 968px) {
