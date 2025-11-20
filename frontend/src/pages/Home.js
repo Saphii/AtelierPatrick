@@ -4,17 +4,24 @@ import { Link } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 
 const HomeContainer = styled.div`
-  max-width: 1400px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0;
   position: relative;
   overflow-x: hidden;
   z-index: 1;
   min-height: 100vh;
   
-  /* Permet le scroll vertical mais cache le débordement horizontal */
+  @media (max-width: 1024px) {
+    padding: 0 10px;
+  }
+  
   @media (max-width: 768px) {
     padding: 0 15px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0 10px;
   }
 `;
 
@@ -71,13 +78,13 @@ const fadeInUp = keyframes`
 
 // Vidéos décoratives de chaque côté de la HeroSection (en dehors de la div)
 const VideoContainer = styled.div`
-  position: fixed;
-  width: ${props => props.width || '350px'};
-  height: ${props => props.height || '450px'};
+  position: absolute;
+  width: ${props => props.width || '300px'};
+  height: ${props => props.height || '400px'};
   ${props => props.side === 'left' 
-    ? 'left: max(20px, calc((100vw - 1400px) / 2 - 400px));' 
-    : 'right: max(20px, calc((100vw - 1400px) / 2 - 400px));'}
-  top: 50vh;
+    ? 'left: calc((100vw - 900px) / 2 - 350px);' 
+    : 'right: calc((100vw - 900px) / 2 - 350px);'}
+  top: 50%;
   transform: translateY(-50%);
   border-radius: 20px;
   overflow: hidden;
@@ -141,13 +148,25 @@ const VideoContainer = styled.div`
     }
   }
   
-  @media (max-width: 1200px) {
-    width: 280px;
-    height: 380px;
+  @media (max-width: 1400px) {
+    ${props => props.side === 'left' 
+      ? 'left: 20px;' 
+      : 'right: 20px;'}
+    width: 250px;
+    height: 350px;
   }
   
-  @media (max-width: 968px) {
-    display: none; /* Masquer sur tablette et mobile */
+  @media (max-width: 1024px) {
+    /* Tablette : vidéos plus petites et mieux positionnées */
+    width: 200px;
+    height: 280px;
+    ${props => props.side === 'left' 
+      ? 'left: 10px;' 
+      : 'right: 10px;'}
+  }
+  
+  @media (max-width: 768px) {
+    display: none; /* Masquer sur mobile */
   }
 `;
 
@@ -156,6 +175,8 @@ const HeroSection = styled.section`
   position: relative;
   min-height: calc(100vh - 200px);
   max-height: calc(100vh - 200px);
+  max-width: 900px;
+  margin: 20px auto 40px auto;
   display: flex;
   align-items: center;
   background: linear-gradient(
@@ -168,11 +189,30 @@ const HeroSection = styled.section`
   background-position: center;
   color: white;
   text-align: center;
-  padding: 60px 0;
-  margin: 20px 20px 40px 20px;
+  padding: 60px 40px;
   border-radius: 30px;
-  overflow: hidden;
+  overflow: visible;
   z-index: 2;
+  
+  @media (max-width: 1024px) {
+    max-width: 95%;
+    padding: 50px 30px;
+    margin: 20px auto 40px auto;
+  }
+  
+  @media (max-width: 768px) {
+    max-width: 100%;
+    padding: 40px 20px;
+    margin: 15px 15px 30px 15px;
+    min-height: calc(100vh - 180px);
+    max-height: calc(100vh - 180px);
+  }
+  
+  @media (max-width: 480px) {
+    padding: 30px 15px;
+    margin: 10px 10px 20px 10px;
+    border-radius: 20px;
+  }
 
   &::before {
     content: "";
@@ -423,7 +463,8 @@ const SectionTitle = styled.h2`
   font-size: 2.5rem;
   margin-bottom: 60px;
   position: relative;
-    animation: ${fadeInUp} 0.8s ease-out;
+  animation: ${fadeInUp} 0.8s ease-out;
+  color: #8b4513;
 
   &::after {
     content: "";
@@ -458,12 +499,48 @@ const SectionTitle = styled.h2`
     background: rgba(139, 69, 19, 0.2);
     border-radius: 2px;
   }
+  
+  @media (max-width: 1024px) {
+    font-size: 2.2rem;
+    margin-bottom: 50px;
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 2rem;
+    margin-bottom: 40px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.7rem;
+    margin-bottom: 30px;
+  }
 `;
 
 const ServicesGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    padding: 0 15px;
+  }
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 25px;
+    padding: 0 10px;
+  }
+  
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0;
+  }
 `;
 
 const ServiceCard = styled.div`
@@ -550,6 +627,16 @@ const ServiceCard = styled.div`
     margin-bottom: 25px;
     color: #8b4513;
     font-weight: 600;
+    
+    @media (max-width: 768px) {
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+    }
+    
+    @media (max-width: 480px) {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+    }
   }
 
   p {
