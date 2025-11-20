@@ -185,17 +185,7 @@ const VideoContainer = styled.div`
   }
   
   @media (max-width: 1024px) {
-    /* Tablette : vidéos plus petites et mieux positionnées */
-    width: 200px;
-    height: 280px;
-    margin-top: -140px; /* Moitié de 280px */
-    ${props => props.side === 'left' 
-      ? 'left: -230px;' 
-      : 'right: -230px;'}
-  }
-  
-  @media (max-width: 968px) {
-    display: none; /* Masquer sur tablette petite et mobile */
+    display: none; /* Masquer sur tablette et mobile */
   }
 `;
 
