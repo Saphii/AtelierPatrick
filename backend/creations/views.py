@@ -60,18 +60,32 @@ class AdminCreationViewSet(viewsets.ModelViewSet):
         return data
 
     def create(self, request, *args, **kwargs):
-        data = self._prepare_data(request, default_available=True)
-        serializer = self.get_serializer(data=data)
-        if serializer.is_valid():
-            creation = serializer.save()
+        try:
+            data = self._prepare_data(request, default_available=True)
+            serializer = self.get_serializer(data=data)
+            if serializer.is_valid():
+                creation = serializer.save()
+                return Response(
+                    {
+                        'message': 'Création ajoutée avec succès !',
+                        'creation': self.get_serializer(creation).data
+                    },
+                    status=status.HTTP_201_CREATED
+                )
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            import traceback
+            error_detail = str(e)
+            traceback_str = traceback.format_exc()
+            print(f"Erreur lors de la création: {error_detail}")
+            print(traceback_str)
             return Response(
                 {
-                    'message': 'Création ajoutée avec succès !',
-                    'creation': self.get_serializer(creation).data
+                    'error': 'Erreur lors de la création',
+                    'detail': error_detail
                 },
-                status=status.HTTP_201_CREATED
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
