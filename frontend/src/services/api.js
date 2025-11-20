@@ -1,12 +1,80 @@
 import axios from "axios";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://217.154.172.35/api";
-const MEDIA_BASE_URL = process.env.REACT_APP_MEDIA_BASE_URL || "http://217.154.172.35";
+// Détection automatique de l'URL de l'API
+const getApiBaseUrl = () => {
+  // Si une variable d'environnement est définie, l'utiliser
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
+  }
+  
+  // Si on est en développement local
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:8000/api';
+  }
+  
+  // En production, utiliser l'URL relative ou l'IP du serveur
+  // Essayer d'abord avec l'URL relative (si le frontend et backend sont sur le même domaine)
+  const protocol = window.location.protocol;
+  const hostname = window.location.hostname;
+  
+  // Si le frontend est sur Netlify ou un autre domaine, utiliser l'IP du serveur
+  // Utiliser HTTPS si disponible, sinon HTTP
+  if (hostname.includes('netlify.app') || hostname.includes('vercel.app') || hostname !== '217.154.172.35') {
+    // Essayer HTTPS d'abord, puis HTTP en fallback
+    return 'http://217.154.172.35/api';
+  }
+  
+  // Sinon, utiliser l'URL relative
+  return '/api';
+};
+
+const getMediaBaseUrl = () => {
+  if (process.env.REACT_APP_MEDIA_BASE_URL) {
+    return process.env.REACT_APP_MEDIA_BASE_URL;
+  }
+  
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:8000';
+  }
+  
+  const hostname = window.location.hostname;
+  if (hostname.includes('netlify.app') || hostname.includes('vercel.app') || hostname !== '217.154.172.35') {
+    return 'http://217.154.172.35';
+  }
+  
+  return '';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+const MEDIA_BASE_URL = getMediaBaseUrl();
 
 // Configuration d'axios avec le token d'authentification
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 30000, // 30 secondes de timeout
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
+
+// Gestion des erreurs réseau
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.code === 'ECONNABORTED') {
+      console.error('Timeout: La requête a pris trop de temps');
+      return Promise.reject({ error: 'La connexion a pris trop de temps. Vérifiez votre connexion internet.' });
+    }
+    if (error.message === 'Network Error' || !error.response) {
+      console.error('Erreur réseau:', error.message);
+      return Promise.reject({ 
+        error: 'Erreur de connexion. Vérifiez votre connexion internet et que le serveur est accessible.',
+        networkError: true 
+      });
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Intercepteur pour ajouter le token d'authentification
 api.interceptors.request.use(
@@ -38,6 +106,13 @@ export const authService = {
 
       return response.data;
     } catch (error) {
+      // Gestion améliorée des erreurs pour mobile
+      if (error.networkError || !error.response) {
+        throw { 
+          error: "Impossible de se connecter au serveur. Vérifiez votre connexion internet.",
+          networkError: true 
+        };
+      }
       throw error.response?.data || { error: "Erreur de connexion" };
     }
   },

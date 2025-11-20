@@ -1,13 +1,101 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { FaArrowRight, FaCube, FaHammer, FaPen, FaStar } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 const HomeContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
   position: relative;
+  overflow: hidden;
+`;
+
+// Animations pour les éléments décoratifs
+const float = keyframes`
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+`;
+
+const floatReverse = keyframes`
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(20px) rotate(-5deg);
+  }
+`;
+
+const pulse = keyframes`
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+`;
+
+const rotate = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+const fadeInUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+// Éléments décoratifs flottants sur les côtés
+const SideDecoration = styled.div`
+  position: fixed;
+  width: ${props => props.size || '200px'};
+  height: ${props => props.size || '200px'};
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.15;
+  ${props => props.left ? 'left: -100px;' : 'right: -100px;'}
+  top: ${props => props.top || '20%'};
+  animation: ${float} ${props => props.duration || '8s'} ease-in-out infinite;
+  animation-delay: ${props => props.delay || '0s'};
+  
+  @media (max-width: 1200px) {
+    display: none;
+  }
+`;
+
+const DecorativeCircle = styled(SideDecoration)`
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b4513, #a0522d);
+  filter: blur(40px);
+  animation: ${pulse} 4s ease-in-out infinite;
+`;
+
+const DecorativeShape = styled(SideDecoration)`
+  background: linear-gradient(45deg, rgba(139, 69, 19, 0.3), rgba(160, 82, 45, 0.3));
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  animation: ${floatReverse} 10s ease-in-out infinite;
+`;
+
+const DecorativeRing = styled(SideDecoration)`
+  border: 3px solid rgba(139, 69, 19, 0.2);
+  border-radius: 50%;
+  animation: ${rotate} 20s linear infinite;
 `;
 
 const Flourish = styled.div`
@@ -82,6 +170,7 @@ const HeroSection = styled.section`
   margin: 40px 20px 80px 20px;
   border-radius: 30px;
   overflow: hidden;
+  z-index: 1;
 
   &::before {
     content: "";
@@ -97,6 +186,22 @@ const HeroSection = styled.section`
       transparent 70%
     );
     animation: shimmer 3s infinite;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%
+    );
+    animation: ${rotate} 30s linear infinite;
+    pointer-events: none;
   }
 
   @keyframes shimmer {
@@ -118,6 +223,7 @@ const HeroSection = styled.section`
 
   .logo-section {
     margin-bottom: 40px;
+    animation: ${fadeInUp} 1s ease-out 0.2s both;
 
     .main-logo {
       width: 240px;
@@ -128,24 +234,37 @@ const HeroSection = styled.section`
       align-items: center;
       justify-content: center;
       margin: 0 auto 30px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 60px rgba(255, 255, 255, 0.1);
       animation: float 3s ease-in-out infinite;
       overflow: hidden;
+      position: relative;
+
+      &::before {
+        content: "";
+        position: absolute;
+        inset: -5px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, rgba(255, 255, 255, 0.3), transparent);
+        animation: ${rotate} 10s linear infinite;
+        z-index: -1;
+      }
 
       img {
         width: 100%;
         height: 100%;
         object-fit: contain;
+        position: relative;
+        z-index: 1;
       }
     }
 
     @keyframes float {
       0%,
       100% {
-        transform: translateY(0px);
+        transform: translateY(0px) scale(1);
       }
       50% {
-        transform: translateY(-15px);
+        transform: translateY(-15px) scale(1.02);
       }
     }
   }
@@ -154,9 +273,32 @@ const HeroSection = styled.section`
     font-size: 4rem;
     margin-bottom: 25px;
     color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.2);
     font-weight: 700;
     letter-spacing: -1px;
+    animation: ${fadeInUp} 1s ease-out;
+    position: relative;
+    
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+      animation: expandLine 1.5s ease-out 0.5s both;
+    }
+
+    @keyframes expandLine {
+      from {
+        width: 0;
+      }
+      to {
+        width: 100px;
+      }
+    }
 
     @media (max-width: 768px) {
       font-size: 2.5rem;
@@ -173,6 +315,8 @@ const HeroSection = styled.section`
     opacity: 0.95;
     font-weight: 300;
     letter-spacing: 0.5px;
+    animation: ${fadeInUp} 1s ease-out 0.3s both;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 
     @media (max-width: 768px) {
       font-size: 1.2rem;
@@ -266,6 +410,7 @@ const SectionTitle = styled.h2`
   font-size: 2.5rem;
   margin-bottom: 60px;
   position: relative;
+    animation: ${fadeInUp} 0.8s ease-out;
 
   &::after {
     content: "";
@@ -273,9 +418,31 @@ const SectionTitle = styled.h2`
     bottom: -10px;
     left: 50%;
     transform: translateX(-50%);
-    width: 80px;
+    width: 0;
     height: 4px;
-    background: #8b4513;
+    background: linear-gradient(90deg, transparent, #8b4513, transparent);
+    border-radius: 2px;
+    animation: expandTitle 1s ease-out 0.5s both;
+  }
+  
+  @keyframes expandTitle {
+    from {
+      width: 0;
+    }
+    to {
+      width: 120px;
+    }
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 2px;
+    background: rgba(139, 69, 19, 0.2);
     border-radius: 2px;
   }
 `;
@@ -292,10 +459,13 @@ const ServiceCard = styled.div`
   border-radius: 25px;
   text-align: center;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-  transition: all 0.4s ease;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(139, 69, 19, 0.1);
+  opacity: 0;
+  animation: ${fadeInUp} 0.6s ease-out forwards;
+  animation-delay: ${props => props.delay || '0s'};
 
   &::before {
     content: "";
@@ -313,12 +483,32 @@ const ServiceCard = styled.div`
     transition: left 0.6s ease;
   }
 
+  &::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+      circle,
+      rgba(139, 69, 19, 0.1) 0%,
+      transparent 70%
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
   &:hover {
-    transform: translateY(-15px);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(139, 69, 19, 0.2);
 
     &::before {
       left: 100%;
+    }
+
+    &::after {
+      opacity: 1;
     }
   }
 
@@ -497,8 +687,38 @@ const TestimonialCard = styled.div`
 `;
 
 const Home = () => {
+  const servicesRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const cards = document.querySelectorAll('[data-service-card]');
+    cards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <HomeContainer>
+      {/* Éléments décoratifs flottants sur les côtés */}
+      <DecorativeCircle left top="10%" size="250px" delay="0s" />
+      <DecorativeShape left top="40%" size="180px" delay="2s" />
+      <DecorativeRing left top="70%" size="150px" delay="4s" />
+      
+      <DecorativeCircle top="20%" size="220px" delay="1s" />
+      <DecorativeShape top="50%" size="200px" delay="3s" />
+      <DecorativeRing top="80%" size="170px" delay="5s" />
+
       <PrintFlourish aria-hidden="true" />
       <LaserFlourish aria-hidden="true" />
       <HeroSection>
@@ -524,10 +744,10 @@ const Home = () => {
         </div>
       </HeroSection>
 
-      <ServicesSection>
+      <ServicesSection ref={servicesRef}>
         <SectionTitle>Nos Services</SectionTitle>
         <ServicesGrid>
-          <ServiceCard>
+          <ServiceCard data-service-card delay="0.1s">
             <div className="icon">
               <FaHammer />
             </div>
@@ -539,7 +759,7 @@ const Home = () => {
             <div className="price">Sur mesure</div>
           </ServiceCard>
 
-          <ServiceCard>
+          <ServiceCard data-service-card delay="0.2s">
             <div className="icon">
               <FaCube />
             </div>
@@ -551,7 +771,7 @@ const Home = () => {
             <div className="price">Sur mesure</div>
           </ServiceCard>
 
-          <ServiceCard>
+          <ServiceCard data-service-card delay="0.3s">
             <div className="icon">
               <FaStar />
             </div>
@@ -563,7 +783,7 @@ const Home = () => {
             <div className="price">Sur mesure</div>
           </ServiceCard>
 
-          <ServiceCard>
+          <ServiceCard data-service-card delay="0.4s">
             <div className="icon">
               <FaPen />
             </div>

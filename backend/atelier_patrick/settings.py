@@ -119,7 +119,24 @@ CORS_ALLOWED_ORIGINS = config(
     default='http://localhost:3000,http://127.0.0.1:3000,http://217.154.172.35'
 ).split(',')
 
+# Autoriser toutes les origines en développement (pour faciliter les tests mobiles)
+# En production, vous devriez spécifier les domaines exacts
+CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=False, cast=bool)
+
 CORS_ALLOW_CREDENTIALS = True
+
+# Headers CORS supplémentaires pour mobile
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # REST Framework settings
 REST_FRAMEWORK = {
